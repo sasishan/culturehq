@@ -4,7 +4,8 @@ var
   express = require('express'),
   http = require('http'),
   path = require('path'),
-  monk = require('monk'),
+  mysql = require('mysql');
+  // monk = require('monk'),
   cookieParser = require('cookie-parser'),
   bodyParser = require('body-parser'),
   cognitoExpress = require('cognito-express'),  
@@ -16,9 +17,27 @@ var
 
 // const { authenticate, authenticationError } = require('aws-cognito-express');
 const app = express();
-const dbURI = config.dbURI;
-const db = monk(dbURI);
+// const dbURI = config.dbURI;
 
+const db = mysql.createConnection({
+  host: config.host,
+  user: config.user,
+  password: config.password,
+  database: config.database
+});
+
+db.connect((err) => {
+  if(err)
+  {
+    console.log('Error connecting to Db');
+    return;
+  }
+  console.log('Connection established');
+});
+
+
+
+// const db = monk(dbURI);
 const cognito = new cognitoExpress(config.COGNITO_CONFIG);
 
 app.set('port', process.env.PORT || config.port);
@@ -111,6 +130,7 @@ validateToken = function(accessTokenFromClient, callback)
 
 //API routes
 app.get('/api/v1/engagement', isNotAuthenticated, APIs.receiveAPIRequest);
+app.get('/api/v1/events', isNotAuthenticated, APIs.receiveAPIRequest);
 // app.get(OpsConfig.APIPaths.GET_OneJotsSections, isAuthenticated, APIs.receiveAPIRequest);
 
 //HTTP SERVER

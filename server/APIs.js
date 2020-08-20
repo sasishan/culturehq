@@ -1,20 +1,8 @@
 var 
 	//Objects = require('../Objects'),
+	Events = require('./routes/Events'),
 	Engagement = require('./routes/Engagement'),
 	Helpers = require('./Helpers');	
-
-// getProcessor = function(operationType)
-// {
-// 	switch(operationType)
-// 	{
-// 		case OpsConfig.ValidOperationsTypes.UpdateJot:
-// 			return Jots.Operation_updateJot;
-
-// 		default:
-// 			console.log('Processors:getProcessor: Invalid operation type '+ operationType + ' found for processor');
-// 			return undefined;
-// 	}
-// };
 
 getAPIProcessor = function(apiPath)
 {
@@ -22,6 +10,9 @@ getAPIProcessor = function(apiPath)
 	{
 		case '/api/v1/engagement':
 			return Engagement.API_getEngagmentResponses;
+
+		case '/api/v1/events':
+			return Events.API_getMyEvents;
 
 		default:
 			console.log('Processors:getAPIProcessor: Invalid path: '+ apiPath + ' found for processor');
