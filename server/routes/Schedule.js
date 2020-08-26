@@ -3,11 +3,17 @@ var  Database  = require('../database/Database')
 	axios = require('axios')
 	;
 
-exports.API_getMyEvents = function(db, eId, params, callback)
+
+exports.API_getTest = function(db, userId, params, callback)
 {
-	if (eId)
+	return callback(null, {result: 'success'});
+}
+
+exports.API_getMyEvents = function(db, userId, params, callback)
+{
+	if (userId)
 	{
-		Database.getEvents(db, eId, {}, callback);
+		Database.getEvents(db, userId, callback);
 		// Database.GetQuery(db, Database.Tables.Teams, findQuery, options, function(error, results)
 		// {
 		// 	if (error)

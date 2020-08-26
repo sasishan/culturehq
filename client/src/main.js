@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
-import VueRouter from 'vue-router';
+import VueRouter from 'vue-router'; 
 
 // eslint-disable-next-line no-unused-vars
 import Amplify, { Auth } from 'aws-amplify';

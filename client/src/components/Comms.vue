@@ -2,29 +2,30 @@
 import { Auth } from 'aws-amplify';
 const axios = require('axios');
 
-// function getToken(session)
-// {
-// 	if (session && session.accessToken)
-// 	{
-// 		return session.accessToken.jwtToken;
-// 	}
-// 	else
-// 	{
-// 		return '';
-// 	}
-// }
+function getTokens(session)
+{
+	if (session && session.accessToken)
+	{
+		var tokens = { accessToken: session.accessToken.jwtToken, idToken: session.idToken.jwtToken }
+		return tokens;
+	}
+	else
+	{
+		return '';
+	}
+}
 
-// function getEmail(session)
-// {
-// 	if (session && session.idToken.payload.email)
-// 	{
-// 		return session.idToken.payload.email
-// 	}
-// 	else
-// 	{
-// 		return '';
-// 	}
-// }
+function getEmail(session)
+{
+	if (session && session.idToken.payload.email)
+	{
+		return session.idToken.payload.email
+	}
+	else
+	{
+		return '';
+	}
+}
 
 async function getAnonymousHeader()
 {
@@ -38,17 +39,17 @@ async function getAnonymousHeader()
 
 async function getHeader()
 {
-	return getAnonymousHeader();
-	// const session = await Auth.currentSession();			
-	// var headers =
- //    {
- //        // 'Authorization': session.idToken.jwtToken, 
-
- //        // 'AccessToken': getToken(session),
- //        // 'content-type': 'application/json',
- //        // 'email': getEmail(session)
-	// };
-	// return headers;
+	// return getAnonymousHeader();
+	const session = await Auth.currentSession();			
+	var tokens = getTokens(session);
+	var headers =
+    {
+        'AccessToken': tokens.accessToken,
+        'Authorization': tokens.idToken,
+        'content-type': 'application/json',
+        'email': getEmail(session)
+	};
+	return headers;
 }
 
 // async function getFileHeader()

@@ -14,13 +14,13 @@
       <div class="listItem small text-muted mt-2">Friday 11AM - Rob</div>                                           
   </div>
 <div class="col-9">
-  <div class="mt-3 mb-5">
-      <span class="h5 ml-2 mb-3"><b>Regular Cadence</b>
+  <div class="mt-3 mb-5 mr-n4">
+      <span class="h5 ml-2 mb-3"><b>Schedule</b>
       <button type="button" class="btn btn-sm btn-primary float-right"><small>New Cadence</small></button>
     </span>
     <hr>
   </div>
-    <div class="card sharp-card shadow-sm ml-2 mt-2">
+    <div class="card sharp-card shadow-sm ml-2 mr-n4 mt-2">
       <div class="card-header">
         <span class="titleColor1"><b>1-on-1's with John Smith</b></span>
         <button type="button" class="btn btn-sm btn-outline-primary float-right"><small>Modify</small></button>
@@ -33,15 +33,15 @@
           <table class="table table-sm">               
             <tr>
               <td>
-                Occurence:
+                <b>Occurence:</b>
               </td>
               <td>
-                Every <span class="text-default"><b>2 weeks</b></span> on <span class="text-default"><b>Wednesday</b></span>
+                Every <span class="text-default"><i>2 weeks</i></span> on <span class="text-default"><i>Wednesday</i></span>
               </td>
             </tr>
             <tr>
               <td>
-                Meeting Subject
+                <b>Meeting Subject</b>
               </td>
               <td>
                 1-on-1 John:Sasi
@@ -49,10 +49,10 @@
             </tr>
             <tr>
               <td>
-                Reminder
+                <b>Reminder  </b>
               </td>
               <td>
-                Send preparation reminder <span class="text-default"><b> 24 hours before</b></span>
+                Send preparation reminder <span class="text-default"><i> 24 hours before</i></span>
               </td>
             </tr>                                
           </table>

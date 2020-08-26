@@ -124,6 +124,12 @@ export default {
     background: #FFF;
   }      
 
+  .yellowBackground1
+  {
+    background: #ffe3c3;
+  }      
+
+
   .noborder{
     border: 0;
   }
@@ -131,4 +137,14 @@ export default {
   .sharp-card {
       border-radius: 0;
   } 
+
+  .btn-outline-grey {
+    color: #000;
+    border-color: #AAA;
+  }
+
+  .clickable
+  {
+    cursor: pointer;
+  }
 </style>

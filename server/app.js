@@ -11,7 +11,8 @@ var
   cognitoExpress = require('cognito-express'),  
   //ROUTES
   // Operations = require('./routes/Operations'),
-  APIs = require('./APIs')
+  APIs = require('./APIs'),
+  Database = require('./database/Database')
   ;
   // Database = require('./Database/Database');
 
@@ -34,8 +35,6 @@ db.connect((err) => {
   }
   console.log('Connection established');
 });
-
-
 
 // const db = monk(dbURI);
 const cognito = new cognitoExpress(config.COGNITO_CONFIG);
@@ -81,7 +80,7 @@ var isAuthenticated = function (req, res, next)
     return res.status(401).send("Access Token missing from header");
   }
 
-  validateToken(accessTokenFromClient, function(err, response)
+  cognito.validate(accessTokenFromClient, function(err, response)
   {
     if (err) 
     {           
@@ -89,9 +88,31 @@ var isAuthenticated = function (req, res, next)
       return res.status(401).send('Invalid token');
     }
 
-    req.user = response;
-    req.eId = response.username;
-    next();
+    req.idToken = req.headers.authorization;
+    req.userId = response.username;
+
+    Database.getUserProfile(req.db, req.userId , function(err, userProfile)
+    {
+      if (err || userProfile.length==0) 
+      {           
+        console.log(err);
+        return res.status(401).send('User not found');
+      }       
+
+      try
+      {
+        var profile = JSON.parse(userProfile);
+        req.userProfile = profile[0];
+        next();
+      }
+      catch (error)
+      {
+        console.log(error);
+        return res.status(401).send('User not found');
+      }
+
+    });  
+    // next();
 
   });
 }
@@ -99,38 +120,20 @@ var isAuthenticated = function (req, res, next)
 var isNotAuthenticated = function (req, res, next) 
 {
     req.user = {};
-    req.eId = 'anonymous'+ new Date().toString();
+    req.userId = 'anonymous'+ new Date().toString();
     next();
 }
 
-validateToken = function(accessTokenFromClient, callback)
-{
-  try
-  {
-    cognito.validate(accessTokenFromClient, function(err, response) 
-    {
-        //If API is not authenticated, Return 401 with error message. 
-        if (err) 
-        {           
-          console.log(err);
-          callback(err, null);
-          // return res.status(401).send('Invalid token');
-        }
-
-        callback(null, response);
-    }); 
-  }
-  catch(err)
-  {
-      console.log(err);
-      callback(err, null);
-  }
-  
-}
 
 //API routes
-app.get('/api/v1/engagement', isNotAuthenticated, APIs.receiveAPIRequest);
+app.get('/api/v1/test', isAuthenticated, APIs.receiveAPIRequest);
+app.get('/api/v1/engagement/dailyquestions', isAuthenticated, APIs.receiveAPIRequest);
+app.get('/api/v1/engagement/responses', isAuthenticated, APIs.receiveAPIRequest);
 app.get('/api/v1/events', isNotAuthenticated, APIs.receiveAPIRequest);
+app.get('/api/v1/oneonone/questionbank', isAuthenticated, APIs.receiveAPIRequest);
+app.get('/api/v1/oneonone/questionbank/categories', isAuthenticated, APIs.receiveAPIRequest);
+app.get('/api/v1/oneonone/templates', isAuthenticated, APIs.receiveAPIRequest);
+
 // app.get(OpsConfig.APIPaths.GET_OneJotsSections, isAuthenticated, APIs.receiveAPIRequest);
 
 //HTTP SERVER

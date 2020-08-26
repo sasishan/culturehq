@@ -4,6 +4,9 @@
       <div class="row">
         <div class="myContainer pt-1 col-9 transparent minHeight">
           <h5 class="mt-3 mb-3"><b>Culture Survey Overview</b></h5>
+          <div v-if="surveyQuestions.initialized==false">
+             <pulse-loader color="#1976d2" size="10px" ></pulse-loader>
+          </div>     
           <span v-for="(surveyQuestion) in surveyQuestions" :key="surveyQuestion.questionId">
             <div class="card sharp-card shadow-sm mt-3 mb-4">              
               <div class="card-header">
@@ -53,7 +56,7 @@
 <script>
 // import MainMenu from '../menus/MainMenu';
 import Comms from '../Comms';
-import { URLS } from '../../Config.js';
+import { URLS } from '../../Constants.js';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 const axios = require('axios');
 
@@ -73,12 +76,40 @@ export default {
   {  
     isLoaded:false,
     surveyResponses:{},
-    surveyQuestions:{},
-    calculatedResponses:{},
+    surveyQuestions:{ initialized: false },
+    calculatedResponses:{},   
   }),
   mounted()
   {
     this.initialize();
+
+    // var cultures = [ "Caring", "Purpose", "Learning", "Enjoyment", "Results", "Authority", "Safety", "Order" ];
+    // var custom = [ "Check-In", "Conclusions", "Flight Risk"];
+    // for (var i=0; i< this.qbank.length; i++)
+    // {
+    //   // var qid = this.qbank[i].Id;
+    //   var question = this.qbank[i].Question;
+    //   var string1 ='insert into QuestionBank1on1(Question) values("'+question+'")';
+    //   this.queries.push(string1);
+    //   for (var j=0; j< this.qbank[i].Culture.length; j++)
+    //   {
+    //     var culture = this.qbank[i].Culture[j];
+    //     var index = cultures.indexOf(culture);
+    //     var index2 = custom.indexOf(culture);
+    //     var string2="";
+    //     if (index>=0)
+    //     {
+    //       string2 ='insert into mapping_QuestionBank_Cultures(questionId, cultureId) values('+(i+1)+','+(index+1)+')';
+    //       this.queries.push(string2);
+    //     }
+    //     else if (index2>=0)
+    //     {
+    //       string2 ="insert into mapping_QuestionBank_CustomCategories(questionId, categoryId, companyId) values("+(i+1)+","+(index2+1)+", 1)";
+    //       this.queries.push(string2);
+    //     }
+    //   }
+    // }
+    // console.log(this.queries[0], this.queries[1]);
   },
   created()
   {
@@ -112,12 +143,12 @@ export default {
         return {};
       });
 
-      if (response && response.Items)
+      if (response)
       {
         this.surveyQuestions = [];
-        for (var i=0; i< response.Items.length; i++)
+        for (var i=0; i< response.length; i++)
         {
-          this.surveyQuestions.push(response.Items[i]);
+          this.surveyQuestions.push(response[i]);
         }        
       }
 

@@ -1,4 +1,6 @@
-// var Objects = require('./Objects');
+var axios = require('axios');
+
+	// var Objects = require('./Objects');
 
 exports.Success=0;
 exports.Error=-1;
@@ -19,9 +21,9 @@ var SuccessCodes=
 };
 exports.SuccessCodes= SuccessCodes;
 
-exports.validateEmployeeId = function(req, res)
+exports.validateUserId = function(req, res)
 {
-	if (!req.eId)
+	if (!req.userId)
 	{			
 		return false;
 	}
@@ -32,13 +34,13 @@ exports.logError = function(error)
 {
 	if (error.message)
 	{
-		console.log('Error: ' + error.message);		
+		console.log('Error1: ' + error.message);		
 	}
 }
 
 exports.logError = function(message, errorCode)
 {
-	console.log('Error: ' + message);
+	console.log('Error2: ' + message);
 	return new exports.Error(message, errorCode);
 }
 
@@ -83,6 +85,40 @@ exports.sendErrorResponse = function(res, error)
 	return res.status(error.errorCode).send(error.message);	
 }
 
+exports.callExternalAPI = function(idToken, apiKey, url, callback)
+{
+
+	var config= 
+	{
+		headers: { 
+	        // 'AccessToken': tokens.accessToken,	        
+	        'content-type': 'application/json', 
+		}
+	};		
+
+	if (idToken)
+	{
+		config.headers.Authorization= idToken;
+	}
+
+	if (apiKey)
+	{
+		config.headers['X-Api-Key'] = apiKey;
+	}
+
+	axios
+	.get(url, config)
+	.then(
+	  	function(response) 
+	  	{ 
+	  		return callback(null, response);
+	  	}, 
+	  	function(error)
+	  	{
+	  		console.log(error);
+	  		return callback(error, null);
+	  	});		
+}
 // exports.getField = function(jsonVar, fieldName, validFieldValues)
 // {
 // 	var fieldValue=undefined;
