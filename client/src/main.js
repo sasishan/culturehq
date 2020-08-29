@@ -9,6 +9,7 @@ import { AmplifyPlugin } from 'aws-amplify-vue';
 
 Vue.config.productionTip = false
 
+
 Amplify.configure({
     Auth: {
         //see details: https://aws-amplify.github.io/docs/js/authentication#manual-setup
@@ -37,6 +38,7 @@ Amplify.configure({
 import routes from './Routes.vue'
 const router  = new VueRouter ({routes});
 Vue.use(VueRouter);
+Vue.use(require('vue-moment'));
 router.beforeEach((to, from, next) => 
 {
     if (to.matched.some(record => record.meta.requiresAuth)) {

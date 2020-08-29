@@ -8,7 +8,7 @@
         <div class="listItem small text-muted mt-2">8/21 @ 11AM - Steve</div>
         <div class="listItem small text-muted mt-2">8/21 @ 11AM - Rob</div>
       </div>
-      <div v-if="isPlannerMode()">
+      <div v-if="isPlannerMode()"> 
         <h6 class="small mt-4 mb-3"><b>Template</b></h6>
         <div class="dropdown">
           <button class="col-12 btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

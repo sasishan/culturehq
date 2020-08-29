@@ -112,6 +112,7 @@ export default {
 .myContainer 
 {
  margin: auto;
+ 
  /*margin-left: 100px;*/
  /*margin-right: 20px;*/
 

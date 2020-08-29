@@ -4,7 +4,8 @@ var
   express = require('express'),
   http = require('http'),
   path = require('path'),
-  mysql = require('mysql');
+  mysql = require('mysql'),
+  cron = require('node-cron'),
   // monk = require('monk'),
   cookieParser = require('cookie-parser'),
   bodyParser = require('body-parser'),
@@ -12,7 +13,8 @@ var
   //ROUTES
   // Operations = require('./routes/Operations'),
   APIs = require('./APIs'),
-  Database = require('./database/Database')
+  Database = require('./database/Database'),
+  Engagement = require('./routes/Engagement')
   ;
   // Database = require('./Database/Database');
 
@@ -128,11 +130,18 @@ var isNotAuthenticated = function (req, res, next)
 //API routes
 app.get('/api/v1/test', isAuthenticated, APIs.receiveAPIRequest);
 app.get('/api/v1/engagement/dailyquestions', isAuthenticated, APIs.receiveAPIRequest);
+app.get('/api/v1/engagement/publishedquestions', isAuthenticated, APIs.receiveAPIRequest);
 app.get('/api/v1/engagement/responses', isAuthenticated, APIs.receiveAPIRequest);
 app.get('/api/v1/events', isNotAuthenticated, APIs.receiveAPIRequest);
 app.get('/api/v1/oneonone/questionbank', isAuthenticated, APIs.receiveAPIRequest);
 app.get('/api/v1/oneonone/questionbank/categories', isAuthenticated, APIs.receiveAPIRequest);
 app.get('/api/v1/oneonone/templates', isAuthenticated, APIs.receiveAPIRequest);
+app.get('/api/v1/engagement/sendlogs', isAuthenticated, APIs.receiveAPIRequest);
+app.post('/api/v1/engagement/sendonequestion',isAuthenticated, APIs.receiveAPIRequest);
+app.post('/api/v1/engagement/:questionId/publish',isAuthenticated, APIs.receiveAPIRequest);
+// app.post('/api/v1/engagement/:questionid/unpublish',isAuthenticated, APIs.receiveAPIRequest);
+app.post('/api/v1/engagement/newquestion',isAuthenticated, APIs.receiveAPIRequest);
+
 
 // app.get(OpsConfig.APIPaths.GET_OneJotsSections, isAuthenticated, APIs.receiveAPIRequest);
 
@@ -141,5 +150,23 @@ var server = http.createServer(app);
 
 server.listen(app.get('port'), function()
 {
+  console.log(new Date());
+  var cronSched = '0 8 * * *';
+  console.log(cronSched);
+  var task= cron.schedule(cronSched, function()
+  {
+    console.log('Running daily scheduled notification process: ' + cronSched);
+    console.log(new Date());
+    Engagement.runDailySurveyQuestion(db, function(error, result)
+      {
+        console.log('runDailySurveyQuestion executed.');
+      });
+  });  
   console.log('CultureHQ server started and listening on port ' + app.get('port'));
+
+
+    // Engagement.runDailySurveyQuestion(db, function(error, result)
+    //   {
+    //     console.log('runDailySurveyQuestion executed.');
+    //   });
 });

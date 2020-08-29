@@ -5,6 +5,68 @@ Tables.DailyQuestions = "DailyQuestions";
 Tables.Events = "Events";
 exports.Tables = Tables;
 
+exports.getDailyEmailsList=function(db, callback)
+{
+	var query = "SELECT * FROM cultureHQ.DailyEmailLists";
+
+	// console.log(userId, questionId, companyId, toEmail, dateSent);
+	return runQuery(db, query, function(error, result)
+	{
+		if (error)
+		{
+			return callback(error, null);
+		}
+
+		var data = JSON.parse(result);
+		return callback(null, data);
+	});
+}
+
+exports.getNextDailyQuestionId = function(db, companyId, callback)
+{
+	var query = `SELECT MIN(questionId) questionId FROM cultureHQ.DailyQuestions D 
+	WHERE D.state='readytosend' and D.companyId=${companyId}`;
+
+	// console.log(userId, questionId, companyId, toEmail, dateSent);
+	return runQuery(db, query, function(error, result)
+	{
+		if (error)
+		{
+			return callback(error, null);
+		}
+
+		var data =[];
+
+		if (result.length>0)
+		{
+			data = JSON.parse(result);
+			// console.log('getNextDailyQuestionId', data);
+		}
+		
+		return callback(null, data);
+	});
+}
+
+exports.logSentEmail = function(db, userId, questionId, companyId, toEmail, callback)
+{
+	
+	var dateSent = (new Date()).toISOString();
+
+	var query = `insert into Log_DailyQuestionEmailsSent (userId, questionId, companyId, dateSent, toEmail) 
+				values( '${userId}', ${questionId}, ${companyId}, '${dateSent}', '${toEmail}')`;
+
+	// console.log(userId, questionId, companyId, toEmail, dateSent);
+	return runQuery(db, query, callback);
+}
+
+exports.getSendLogs = function(db, companyId, callback)
+{
+	var query = `SELECT L.id, D.questionId, D.question, L.dateSent, L.toEmail FROM Log_DailyQuestionEmailsSent L, DailyQuestions D 
+		where L.questionId = D.questionId and L.companyId=${companyId} order by L.dateSent DESC`;
+
+	return runQuery(db, query, callback);
+}
+
 exports.getUserProfile = function(db, userId, callback)
 {
 	var query = "select * from Users where userId='" + userId+"'";
@@ -17,10 +79,158 @@ exports.getEvents = function(db, userId, callback)
 	return runQuery(db, query, callback);
 }	
 
-exports.getDailyQuestions = function(db, companyId, callback)
+exports.setQuestionLastSent = function(db, questionId, callback)
 {
-	var query = "select * from " + Tables.DailyQuestions + " where companyId='" + companyId+"'";
+	var lastSent = (new Date).toISOString();
+	var query = `UPDATE DailyQuestions SET lastSent='${lastSent}', state='sent' WHERE questionId=${questionId}`;
 	return runQuery(db, query, callback);
+}	
+
+exports.setQuestionPublish = function(db, questionId, companyId, isPublished, callback)
+{
+	var lastSent = (new Date).toLocaleDateString();
+	var publish='N';
+	if (isPublished)
+	{
+		publish='Y';
+	}
+	var query = `UPDATE DailyQuestions SET publish='${publish}' WHERE questionId=${questionId}`;
+	return runQuery(db, query, callback);
+}	
+
+exports.createNewQuestion = function(db, companyId, newQuestion, callback)
+{
+	newQuestion.answers = JSON.stringify(newQuestion.answers);
+	var query = `insert into cultureHQ.DailyQuestions (question, answers, companyId, publish) 
+				values('${newQuestion.question}', '${newQuestion.answers}', ${companyId}, 'N' )`;
+	console.log(newQuestion);
+	runQuery(db, query, function(error, result)
+	{
+		if (error)
+		{
+			return callback(error, null);
+		}
+
+		var result = JSON.parse(result);
+		var questionId = result.insertId;
+		console.log(result, questionId);
+		for (var i=0; i< newQuestion.cultures.length; i++)
+		{
+			var culture = newQuestion.cultures[i];
+			query = `insert into mapping_DailyQuestions_Cultures values('${questionId}', '${culture.cultureId}')`;
+
+			runQuery(db, query, function(error, result)
+			{
+				if (error)
+				{
+					return callback(error, null);
+				}
+			});
+		}
+		return callback(null, questionId);
+	});
+}	
+
+
+exports.getOneDailyQuestion = function(db, questionId, companyId, callback)
+{
+	var query = "SELECT D.questionId, D.question, D.answers, C.name as culture \
+				FROM DailyQuestions D, mapping_DailyQuestions_Cultures M, Cultures C  \
+				where D.questionId="+questionId+ " \
+				and D.questionId=M.questionId \
+				and C.cultureId=M.cultureId \
+				and D.companyId="+companyId;
+
+	// "select * from " + Tables.DailyQuestions + " where companyId='" + companyId+"'";
+	return runQuery(db, query, function(error, result)
+	{
+		if (error)
+		{
+			console.log('Error running query: ' + query);
+			return callback(error, null);
+		}
+
+		var tempTemplate={};
+		var templates=[];
+
+		var data = JSON.parse(result);
+		for (var i=0; i<data.length;i++)
+		{
+			
+			var t = data[i];
+
+			t.answers = JSON.parse(t.answers);
+			if (tempTemplate[t.questionId]==undefined)
+			{
+				tempTemplate[t.questionId] = 
+				{ 
+					questionId: t.questionId, 
+					question: t.question,
+					answers: t.answers,
+					cultures: []
+				};					
+				templates.push(tempTemplate[t.questionId]);
+			}
+			
+			tempTemplate[t.questionId].cultures.push({cultureId: t.cultureId, culture: t.culture});	
+		}		
+
+		return callback(null, templates);
+	});
+}
+
+exports.getDailyQuestions = function(db, companyId, onlyPublished=true, callback)
+{
+	var publish=" AND D.publish = 'Y' ";
+
+	var query = "SELECT D.questionId, D.question, D.answers, D.publish, C.name as culture, C.cultureId, D.lastSent \
+				FROM DailyQuestions D, mapping_DailyQuestions_Cultures M, Cultures C \
+				where D.questionId=M.questionId and C.cultureId=M.cultureId and D.companyId="+companyId;
+
+	if (onlyPublished==true)
+	{
+		query+=publish;
+	}
+
+	query+=" ORDER BY D.questionId DESC"
+	// "select * from " + Tables.DailyQuestions + " where companyId='" + companyId+"'";
+	return runQuery(db, query, function(error, result)
+	{
+		if (error)
+		{
+			console.log('Error running query: ' + query);
+			return callback(error, null);
+		}
+
+		var tempTemplate={};
+		var templates=[];
+
+		var data = JSON.parse(result);
+		for (var i=0; i<data.length;i++)
+		{
+			
+			var t = data[i];
+
+			t.answers = JSON.parse(t.answers);
+			if (tempTemplate[t.questionId]==undefined)
+			{
+				tempTemplate[t.questionId] = 
+				{ 
+					questionId: t.questionId, 
+					question: t.question,
+					answers: t.answers,
+					lastSent: t.lastSent,
+					publish: t.publish,
+					cultures: []
+				};					
+				templates.push(tempTemplate[t.questionId]);
+			}
+			
+			tempTemplate[t.questionId].cultures.push({cultureId: t.cultureId, culture: t.culture});	
+		}		
+
+		return callback(null, templates);
+	});
 }	
 
 exports.getQuestionBankCultures  = function(db, companyId, params, callback)

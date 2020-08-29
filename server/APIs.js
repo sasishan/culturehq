@@ -15,11 +15,23 @@ getAPIProcessor = function(apiPath)
 		case '/api/v1/engagement/dailyquestions':
 			return Engagement.API_getEngagementDailyQuestions;
 
+		case '/api/v1/engagement/publishedquestions':
+			return Engagement.API_getEngagementDailyQuestionsPublished;		
+
+		case '/api/v1/engagement/sendlogs':
+			return Engagement.API_getSendLogs;
+
+		case '/api/v1/engagement/newquestion':
+			return Engagement.API_newQuestion;
+
+		case '/api/v1/engagement/:questionId/publish':
+			return Engagement.API_publishDailyQuestion;
+
+		case '/api/v1/engagement/sendonequestion':
+			return Engagement.API_sendOneSurveyQuestion;
+
 		case '/api/v1/events':
 			return Schedule.API_getMyEvents;
-
-		case '/api/v1/test':
-			return Schedule.API_getTest;
 
 		case '/api/v1/oneonone/questionbank':
 			return OneOnOnes.API_getQuestionBank;
@@ -53,7 +65,7 @@ exports.receiveAPIRequest = function(req, res)
 		var APIProcessor = getAPIProcessor(req.route.path);
 		if (APIProcessor)
 		{
-			APIProcessor(req.db, req.userId, { params: req.params, idToken: req.idToken, userProfile: req.userProfile }, function(error, result)
+			APIProcessor(req.db, req.userId, { params: req.params, body: req.body, idToken: req.idToken, userProfile: req.userProfile }, function(error, result)
 			{
 				if (error)
 				{

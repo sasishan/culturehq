@@ -83,6 +83,26 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
 
+/* Style the input fields */
+  input {
+    padding: 10px;
+    width: 100%;
+    font-size: 12px;
+    border: 1px solid #aaaaaa;
+  }
+
+  .drop-zone {
+    background-color: #eee;
+    margin-bottom: 10px;
+    padding: 10px;
+  }
+
+  .drag-el {
+    background-color: #fff;
+    margin-bottom: 10px;
+    padding: 5px;
+  }
+
   .gradientColor
   {
     /*background-image: linear-gradient(180deg, #ff8a00, #ff4a00);*/

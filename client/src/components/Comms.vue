@@ -98,6 +98,28 @@ export default
 			console.log('An error occurred: ', err);
 			return callback(err, null);
 		}
+
+		// var headers = await getHeader();
+		// return new Promise(function(resolve, reject) 
+		// {
+		// 	try 
+		// 	{
+		// 		var response = await axios.post(url, data, {headers: headers}).then(function(response)
+		// 		{
+		// 			var results = response.data;
+		// 			resolve(results);
+		// 		}, function(error)
+		// 		{
+		// 			console.log('An error occurred: ', error);
+		// 			reject(error);
+		// 		});
+		// 	}
+		// 	catch (err) 
+		// 	{
+		// 		console.log('An error occurred: ', err);
+		// 		reject(err);
+		// 	}		
+		// });		
 	},	
 	// async getFile(url, callback)
 	// {

@@ -3,17 +3,29 @@
     <div class="tab-content">
       <div class="row">
         <div class="myContainer pt-1 col-9 transparent minHeight">
-          <h5 class="mt-3 mb-3"><b>Culture Survey Overview</b></h5>
+          <h5 class="mt-3 mb-3"><b>Culture Score</b></h5>
           <div v-if="surveyQuestions.initialized==false">
-             <pulse-loader color="#1976d2" size="10px" ></pulse-loader>
+             <!-- <pulse-loader color="#1976d2" size="10px" ></pulse-loader> -->
           </div>     
+          <div class="card mt-3 mb-4 p-4 small"> 
+            <div class="text-center" v-if="!isLoaded">
+              <pulse-loader color="#1976d2" size="10px" ></pulse-loader>
+            </div>     
+            <span v-if="isLoaded">      
+            <p>Questions Asked: {{cultureSummary.totalQuestions}}</p>
+            <p>Total Responses Received: {{cultureSummary.totalResponses}}</p>              
+            </span>
+            <canvas id="CultureSummary" width="400" height="100"></canvas>                      
+          </div>
+          <hr>
+          <h5 class="mt-3 mb-3"><b>Survey Responses</b></h5>
           <span v-for="(surveyQuestion) in surveyQuestions" :key="surveyQuestion.questionId">
-            <div class="card sharp-card shadow-sm mt-3 mb-4">              
+            <div class="card sharp-card shadow-sm mt-3 mb-4" >              
               <div class="card-header">
                 <span class="titleColor2"><b>{{surveyQuestion.question}}</b></span>                                
                 <small>
-                    <span class="badge badge-secondary ml-2 mt-1" v-for="culture in surveyQuestion.cultures" :key="culture">
-                    {{culture}}
+                    <span class="badge badge-secondary ml-2 mt-1" v-for="culture in surveyQuestion.cultures" :key="culture.cultureId">
+                    {{culture.culture}}
                     </span>
                 </small><br>
                 <small>{{surveyQuestion.lastSent}}</small>
@@ -31,7 +43,7 @@
                     </span><br><br>
                     <small>Responses: {{getNumberResponses(surveyQuestion.questionId)}}</small>
                   </h6>                 
-                  <p class="card-text">
+                  <p class="card-text">                    
                     <canvas :id="surveyQuestion.questionId" width="400" height="100"></canvas>
                     <hr>
                     <h6 class="card-title">
@@ -57,6 +69,7 @@
 // import MainMenu from '../menus/MainMenu';
 import Comms from '../Comms';
 import { URLS } from '../../Constants.js';
+import { ChartColors } from '../../Constants.js';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 const axios = require('axios');
 
@@ -78,6 +91,8 @@ export default {
     surveyResponses:{},
     surveyQuestions:{ initialized: false },
     calculatedResponses:{},   
+    cultureOptions:[],
+    cultureSummary:{totalResponses:0, totalQuestions:0}
   }),
   mounted()
   {
@@ -123,10 +138,80 @@ export default {
       
       await this.loadSurveyQuestions();
       await this.loadSurveyResponses();
+      await this.loadCultureOptions();
       this.calculateResponses(this.surveyQuestions, this.surveyResponses);  
       this.renderCharts();
       this.isLoaded=true;
+
+      this.calculateCultureSummary();
     },
+    async loadCultureOptions()
+    {
+      var url= URLS.questionCultures;
+
+      var response = await Comms.get(url).catch((error) => 
+      { 
+        console.log(error);
+        return {};
+      });
+
+      if (response)
+      {
+        this.cultureOptions = [];
+        for (var i=0; i< response.length; i++)
+        {
+          this.cultureOptions.push(response[i]);
+        }        
+      }
+
+      return this.cultureOptions;
+    },    
+    calculateCultureSummary()
+    {
+      var cultureLabels=[];
+      var data=[];
+      var number=[];
+      for (var i=0; i<this.cultureOptions.length; i++)
+      {
+        cultureLabels.push(this.cultureOptions[i].name);
+        data.push(0);
+        number.push(0);
+      } 
+
+      for (var j=0; j<this.surveyQuestions.length; j++)
+      {
+        this.cultureSummary.totalQuestions+=1;
+        if (this.surveyQuestions[j].cultures.length>0)
+        {
+          for (var l=0; l<this.surveyQuestions[j].cultures.length;l++)
+          {
+            var cultureName = this.surveyQuestions[j].cultures[l].culture;
+            var cultureId = this.surveyQuestions[j].cultures[l].cultureId;
+            for (var k=0; k<cultureLabels.length;k++)
+            {
+              if (cultureName==cultureLabels[k])
+              {
+                var score = this.getTotalResponseScore(this.surveyQuestions[j].questionId);
+                if (score!='Not enough data')
+                {
+                  data[k]+=parseFloat(score);
+                  number[k]+=1;
+                  
+                  this.cultureSummary.totalResponses+=this.getNumberResponses(this.surveyQuestions[j].questionId);
+                }
+                break;
+              }
+            }  
+          }
+        }
+      }       
+      for (i=0; i<data.length;i++)
+      {
+        data[i]=(data[i]/number[i]);
+      }
+      this.renderBarChart('bar', ChartColors.cultureBackgroundColors,  ChartColors.cultureBorderColors, 'CultureSummary', cultureLabels, data);
+      
+    },    
     renderCharts()
     {
       for (var i=0; i<this.surveyQuestions.length; i++)
@@ -136,7 +221,7 @@ export default {
     },
     async loadSurveyQuestions()
     {
-      var url= URLS.surveyQuestions;
+      var url= URLS.surveyQuestionsPublished;
 
       var response = await Comms.get(url).catch((error) => 
       { 
@@ -223,7 +308,7 @@ export default {
         labels = Object.keys(this.calculatedResponses[qId].answers);       
         var data=Object.values(this.calculatedResponses[qId].answers);
         
-        this.renderBarChart(qId, labels, data);
+        this.renderBarChart('bar', ChartColors.questionBackgroundColors,  ChartColors.questionBorderColors, qId, labels, data);
         // return this.calculatedResponses[qId].answers;
       }
       else
@@ -296,36 +381,43 @@ export default {
             return ((x >y) ? -1 : ((x < y) ? 1 : 0));
         });
     },
-    renderBarChart(id, labels, responseArray)
+    renderBarChart(chartType, bgColors, borderColors, id, labels, responseArray)
     {
+      if (document.getElementById(id)==null)
+      {
+        return;
+      }
+
+      // var questionBackgroundColors=  [
+      //                 'rgba(75, 192, 192, 0.2)',
+      //                 'rgba(75, 192, 192, 0.2)',                            
+      //                 'rgba(255, 206, 86, 0.2)',
+      //                 'rgba(255, 206, 86, 0.2)',                      
+      //                 'rgba(255, 99, 132, 0.2)',
+      //                 'rgba(54, 162, 235, 0.2)',
+      //                 'rgba(153, 102, 255, 0.2)',
+      //                 'rgba(255, 159, 64, 0.2)'];
+
+      // var questionBorderColors = 
+      // [ 'rgba(75, 192, 192, 1)',
+      //   'rgba(75, 192, 192, 1)',
+      //   'rgba(255, 206, 86, 1)',                      
+      //   'rgba(255, 206, 86, 1)',                            
+      //   'rgba(255, 99, 132, 1)',
+      //   'rgba(54, 162, 235, 1)',
+      //   'rgba(153, 102, 255, 1)',
+      //   'rgba(255, 159, 64, 1)' ]
+
       var ctx = document.getElementById(id).getContext('2d');
       var myChart = new Chart(ctx, {
-          type: 'bar',
+          type: chartType,
           data: {
               labels: labels,
               datasets: [{
                   label: '',
                   data: responseArray,
-                  backgroundColor: [
-                      'rgba(75, 192, 192, 0.2)',
-                      'rgba(75, 192, 192, 0.2)',                            
-                      'rgba(255, 206, 86, 0.2)',
-                      'rgba(255, 206, 86, 0.2)',                      
-                      'rgba(255, 99, 132, 0.2)',
-                      'rgba(54, 162, 235, 0.2)',
-                      'rgba(153, 102, 255, 0.2)',
-                      'rgba(255, 159, 64, 0.2)'
-                  ],
-                  borderColor: [
-                      'rgba(75, 192, 192, 1)',
-                      'rgba(75, 192, 192, 1)',
-                      'rgba(255, 206, 86, 1)',                      
-                      'rgba(255, 206, 86, 1)',                            
-                      'rgba(255, 99, 132, 1)',
-                      'rgba(54, 162, 235, 1)',
-                      'rgba(153, 102, 255, 1)',
-                      'rgba(255, 159, 64, 1)'
-                  ],
+                  backgroundColor: bgColors,
+                  borderColor: borderColors,
                   borderWidth: 1
               }]
           },
