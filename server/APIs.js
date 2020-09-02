@@ -9,6 +9,12 @@ getAPIProcessor = function(apiPath)
 {
 	switch(apiPath)
 	{
+		case '/api/v1/myprofile':
+			return Users.API_myProfile
+
+		case '/api/v1/engagement/recommendations':
+			return Engagement.API_getQuestionRecommendations;
+
 		case '/api/v1/engagement/responses':
 			return Engagement.API_getEngagmentResponses;
 

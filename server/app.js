@@ -137,6 +137,9 @@ app.get('/api/v1/oneonone/questionbank', isAuthenticated, APIs.receiveAPIRequest
 app.get('/api/v1/oneonone/questionbank/categories', isAuthenticated, APIs.receiveAPIRequest);
 app.get('/api/v1/oneonone/templates', isAuthenticated, APIs.receiveAPIRequest);
 app.get('/api/v1/engagement/sendlogs', isAuthenticated, APIs.receiveAPIRequest);
+app.get('/api/v1/myprofile', isAuthenticated, APIs.receiveAPIRequest);
+app.post('/api/v1/engagement/recommendations', isAuthenticated, APIs.receiveAPIRequest);
+
 app.post('/api/v1/engagement/sendonequestion',isAuthenticated, APIs.receiveAPIRequest);
 app.post('/api/v1/engagement/:questionId/publish',isAuthenticated, APIs.receiveAPIRequest);
 // app.post('/api/v1/engagement/:questionid/unpublish',isAuthenticated, APIs.receiveAPIRequest);
@@ -145,23 +148,29 @@ app.post('/api/v1/engagement/newquestion',isAuthenticated, APIs.receiveAPIReques
 
 // app.get(OpsConfig.APIPaths.GET_OneJotsSections, isAuthenticated, APIs.receiveAPIRequest);
 
+var args = process.argv.slice(2);
+
 //HTTP SERVER
 var server = http.createServer(app);
 
 server.listen(app.get('port'), function()
 {
-  console.log(new Date());
-  var cronSched = '0 8 * * *';
-  console.log(cronSched);
-  var task= cron.schedule(cronSched, function()
+  if (args.includes('-nodaily')==false)
   {
-    console.log('Running daily scheduled notification process: ' + cronSched);
     console.log(new Date());
-    Engagement.runDailySurveyQuestion(db, function(error, result)
-      {
-        console.log('runDailySurveyQuestion executed.');
-      });
-  });  
+    var cronSched = '0 8 * * *';
+    console.log('Daily scheduled notification process initiated: ' + cronSched);
+    var task= cron.schedule(cronSched, function()
+    {
+      console.log('Running daily scheduled notification process: ' + cronSched);
+      console.log(new Date());
+      Engagement.runDailySurveyQuestion(db, function(error, result)
+        {
+          console.log('runDailySurveyQuestion executed.');
+        });
+    }); 
+  }
+ 
   console.log('CultureHQ server started and listening on port ' + app.get('port'));
 
 

@@ -1,5 +1,7 @@
 // var surveyResults= "https://vwtcceuev6.execute-api.us-west-2.amazonaws.com/default/myCultureSurvey";
 var baseURL = "http://localhost:3030";
+// var baseURL = "https://culturehq.honchohq.com/"
+// "http://3.221.72.198/";
 export const URLS = Object.freeze({
 	surveyQuestions: baseURL+"/api/v1/engagement/dailyquestions",
 	surveyQuestionsPublished: baseURL+"/api/v1/engagement/publishedquestions",
@@ -13,6 +15,7 @@ export const URLS = Object.freeze({
 	createNewQuestion: baseURL + "/api/v1/engagement/newquestion",
 	publishQuestion: baseURL + "/api/v1/engagement/",
 	getLogs: baseURL + "/api/v1/engagement/sendlogs",
+	engagementURL: baseURL + "/api/v1/engagement/recommendations",
 	// "https://h6oygjk5ci.execute-api.us-west-2.amazonaws.com/default/myCultureQuestions"
 });
 
@@ -41,6 +44,8 @@ export const ChartColors = Object.freeze({
                       'rgba(255, 206, 86, 0.2)',                      
                       'rgba(255, 99, 132, 0.2)',
                       'rgba(153, 102, 255, 0.2)',
+                      'rgba(255, 99, 132, 0.2)',
+                      'rgba(54, 162, 235, 0.2)',                      
                       'rgba(255, 159, 64, 0.2)'],
 	cultureBorderColors :
       [

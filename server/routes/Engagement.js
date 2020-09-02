@@ -5,6 +5,123 @@ var  Database  = require('../database/Database')
 	,mail = require('./Mail.js')
 	;
 
+exports.API_getQuestionRecommendations = function(db, userId, params, callback)
+{
+	if (userId)
+	{
+		var companyId = params.userProfile.companyId;
+		var scores = params.body.scores;
+		var questionIds=[];
+		var questionScores={};
+		for (var i=0; i<scores.length; i++)
+		{
+			questionIds.push(scores[i].questionId);
+			questionScores[scores[i].questionId] = scores[i].score;
+		}
+
+		Database.getQuestionRecommendation(db, companyId, questionIds, function(error, results)
+		{
+			if (error)
+			{
+				console.log(error);
+				return callback(error, null);
+			}
+			// console.log('API_getQuestionInsights', results);
+
+			if (results.length==0)
+			{
+				// console.log('no results');
+				return callback(null, results);
+			}	
+			
+			var recommendations=[];
+			for (var i=0; i< results.length;i++)
+			{
+				var rec = results[i];
+				var newRecommendation = {questionId: rec.questionId, score:score, recommendation:  "No recommendation"};
+				if (this.questionScores[rec.questionId]!=undefined)
+				{
+					var score = this.questionScores[rec.questionId];
+
+					try 
+					{
+						rec.recommendation = JSON.parse(rec.recommendation);	
+						newRecommendation.recommendation = getRecommendation(score, rec.recommendation);	
+					}
+					catch (e)
+					{
+						console.log('Error parsing Question #' + rec.questionId, e, rec.recommendation);
+						newRecommendation.recommendation ="Error parsing";
+					}
+					// rec.recommendation = JSON.parse(rec.recommendation);
+					
+
+					// recommendations.push({questionId: rec.questionId, score:score, recommendation: rec});
+					// console.log(recommendations, rec.questionId);
+				}
+
+				recommendations.push(newRecommendation);
+			}
+			// console.log(recommendations, rec.questionId);
+			return callback(null, recommendations);
+
+		}.bind({questionScores:questionScores}));
+	}
+	else
+	{
+		console.log('Error with id');
+		return callback('Error with id', null);
+	}	
+}
+
+// [
+// 	{
+// 		minValue: 0,
+// 		maxValue: 1, 
+// 		recommendation: "Consider blah blh blah."
+// 	},
+// 	{
+// 		minValue: 1,
+// 		maxValue: 3, 
+// 		recommendation: "Consider blah blh blah."
+// 	},
+// 	{
+// 		minValue: 3,
+// 		maxValue: 5, 
+// 		equalTo: 5,
+// 		recommendation: "Consider blah blh blah."
+// 	},
+// 	defaultRecommendation: "Not recommendation found for this score"
+// ]	
+
+getRecommendation=function(score, questionRecLogic)
+{
+	
+	for (var i=0; i<questionRecLogic.recommendations.length; i++)
+	{
+		var rec = questionRecLogic.recommendations[i];
+		if (rec.equalTo!=undefined)
+		{
+			if (score==rec.equalTo)
+			{
+				return rec.recommendation;
+			}	
+		}
+
+		// console.log(score, rec.minValue, rec.maxValue);
+		if (rec.minValue!=undefined && rec.maxValue!=undefined)
+		{
+			// console.log(rec.minValue, rec.maxValue, score);
+			if (score>=rec.minValue && score<rec.maxValue)
+			{
+				// console.log(rec.recommendation, score);
+				return rec.recommendation;
+			}
+		}
+	}
+	return questionRecLogic.defaultRecommendation;
+}
+
 exports.API_getSendLogs = function(db, userId, params, callback)
 {
 	if (userId)
@@ -353,38 +470,6 @@ exports.API_getEngagmentResponses = function(db, userId, params, callback)
 			}			
 			return callback(null, response.data);
 		});
-
-
-		// var config= {
-		// 	headers: { 
-		// 		'content-type':'application/json', 
-		// 	}
-		// };		
-		// var url = "https://b6i15gvzmj.execute-api.us-west-2.amazonaws.com/default/myCultureSurveyResponses";
-
-		// axios
-		// .get(url, config)
-		// .then(
-		//   	function(response) 
-		//   	{ 
-		//   		// console.log(response.data);
-		//   		return callback(null, response.data);
-		//   	}, function(error)
-		//   	{
-		//   		console.log(error);
-		//   		return callback(error, null);
-		//   	});		
-
-		// Database.GetQuery(db, Database.Tables.Teams, findQuery, options, function(error, results)
-		// {
-		// 	if (error)
-		// 	{
-		// 		console.log(error);
-		// 		return callback(error, null);
-		// 	}
-
-		// 	return callback(null, results);
-		// });
 	}
 	else
 	{

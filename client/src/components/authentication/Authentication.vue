@@ -2,6 +2,7 @@
   <div class="container">    
     <h1 class="text-center mt-5"><b>CultureHQ</b></h1>  
       <SignIn v-if="shouldBeSignInPage" @error="setErrorMessage" @clearError="clearErrorMessage"></SignIn>
+      <Forgot v-if="shouldBeForgotPage" @authState="authStateChanged"></Forgot>
       <p class="text-center text-danger mt-3" v-if="errorExists">Error: {{error.message}}</p>
       <p class="text-center mt-3" v-if="!errorExists">.</p>
       <div class="text-center" v-if="shouldBeSignInPage">
@@ -9,14 +10,18 @@
           Forgot your password? <span class="ml-2 text-primary" style="cursor: pointer" @click="forgot">Reset password</span>
         </p> 
       </div>
-      
+      <div class="text-center" v-if="shouldBeForgotPage">
+        <div class=" mt-4 small">
+          Back to<span class="ml-2 text-primary" style="cursor: pointer" @click="signIn">Sign in</span>
+        </div>
+      </div>       
   </div>
 </template>
 <script>
 import SignIn from './SignIn';
 import { Auth } from 'aws-amplify'
 // import SignUp from './SignUp';
-// import Forgot from './Forgot';
+import Forgot from './Forgot';
 
 export default 
 {
@@ -29,6 +34,7 @@ export default
   components: 
   {
     SignIn, 
+    Forgot
     // SignUp,
     // Forgot
   },

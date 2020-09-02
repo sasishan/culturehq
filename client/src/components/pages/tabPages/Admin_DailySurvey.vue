@@ -60,7 +60,7 @@
               <h6>Question: {{selectedQuestion.question}}</h6>
 
             </div>
-            <label>Emails:</label>
+            <label>Emails (comma separated):</label>
             <input type="text" class="col-12" v-model="emailAddresses" placeholder="Enter email addresses separated by commas"/>
             <div class="mt-2 text-success"><b>{{message}}</b></div>
           </div>

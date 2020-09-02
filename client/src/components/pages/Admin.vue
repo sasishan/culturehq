@@ -12,7 +12,6 @@
             <div class="nav nav-pills mt-2" id="nav-tab" role="tablist">                        
               <a class="nav-item nav-link active" id="nav-templates-tab" data-toggle="tab" href="#nav-templates" role="tab" aria-controls="nav-home" aria-selected="true"><small><b>Daily Questions</b></small></a>
               <a class="nav-item nav-link " id="nav-logs-tab" data-toggle="tab" href="#nav-logs" role="tab" aria-controls="nav-profile" aria-selected="false"><small><b>Logs</b></small></a>                
-              <a class="nav-item nav-link" id="nav-insights-tab" data-toggle="tab" href="#nav-insights" role="tab" aria-controls="nav-home" aria-selected="true"><small><b>1-on-1 Question Bank</b></small></a>                
             </div>
           </nav>
           <div class="tab-content mt-4 mb-4" id="nav-tabContent"  style="border: 1px solid #DDD;">

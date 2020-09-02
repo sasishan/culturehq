@@ -44,17 +44,15 @@
                     <small>Responses: {{getNumberResponses(surveyQuestion.questionId)}}</small>
                   </h6>                 
                   <p class="card-text">                    
-                    <canvas :id="surveyQuestion.questionId" width="400" height="100"></canvas>
-                    <hr>
+                    <canvas :id="surveyQuestion.questionId" width="400" height="100" class="mb-4"></canvas>
+                      <br>
+                      <hr class="">
+                  
                     <h6 class="card-title">
-                        Trends
+                        Question Insight & Actions
                     </h6>
-                    --- Future: show graph of trending scores for this question
-                    <br>
-                    <h6 class="card-title">
-                        Recommendations
-                    </h6>
-                    --- Future: based on the score types of 1-on-1 questions to ask, actions to take 
+                    <div class="myContainer" v-html="surveyQuestion.recommendation" v-if="surveyQuestion.recommendation"></div>
+                    <div class="myContainer" v-if="surveyQuestion.recommendation==undefined">None found.</div>
                 </small>
               </div>
             </div>              
@@ -98,33 +96,6 @@ export default {
   {
     this.initialize();
 
-    // var cultures = [ "Caring", "Purpose", "Learning", "Enjoyment", "Results", "Authority", "Safety", "Order" ];
-    // var custom = [ "Check-In", "Conclusions", "Flight Risk"];
-    // for (var i=0; i< this.qbank.length; i++)
-    // {
-    //   // var qid = this.qbank[i].Id;
-    //   var question = this.qbank[i].Question;
-    //   var string1 ='insert into QuestionBank1on1(Question) values("'+question+'")';
-    //   this.queries.push(string1);
-    //   for (var j=0; j< this.qbank[i].Culture.length; j++)
-    //   {
-    //     var culture = this.qbank[i].Culture[j];
-    //     var index = cultures.indexOf(culture);
-    //     var index2 = custom.indexOf(culture);
-    //     var string2="";
-    //     if (index>=0)
-    //     {
-    //       string2 ='insert into mapping_QuestionBank_Cultures(questionId, cultureId) values('+(i+1)+','+(index+1)+')';
-    //       this.queries.push(string2);
-    //     }
-    //     else if (index2>=0)
-    //     {
-    //       string2 ="insert into mapping_QuestionBank_CustomCategories(questionId, categoryId, companyId) values("+(i+1)+","+(index2+1)+", 1)";
-    //       this.queries.push(string2);
-    //     }
-    //   }
-    // }
-    // console.log(this.queries[0], this.queries[1]);
   },
   created()
   {
@@ -144,7 +115,44 @@ export default {
       this.isLoaded=true;
 
       this.calculateCultureSummary();
+      await this.loadQuestionRecommendations();
     },
+    async loadQuestionRecommendations()
+    {
+
+      var url= URLS.engagementURL;
+      var payload={scores:[]};
+      for (var i=0; i<this.surveyQuestions.length;i++)
+      {
+        payload.scores.push( 
+          { 
+            questionId: this.surveyQuestions[i].questionId, 
+            score: this.getTotalResponseScore(this.surveyQuestions[i].questionId)
+          });
+      }
+
+      var that =this;
+      Comms.post(url, payload, function(error, recommendations)
+      {
+        if (recommendations)
+        {
+          for (var i=0; i<recommendations.length;i++)
+          {
+            for (var j=0; j<that.surveyQuestions.length; j++)
+            {
+              if (that.surveyQuestions[j].questionId==recommendations[i].questionId)
+              {
+                // this.$set(this.selectedQuestions, question.questionId, question);
+                that.$set(that.surveyQuestions[j], 'recommendation', recommendations[i].recommendation);
+                // that.surveyQuestions[j].recommendation=recommendations[i].recommendation;
+              }
+            }            
+          }
+        }
+      });
+
+    },
+
     async loadCultureOptions()
     {
       var url= URLS.questionCultures;

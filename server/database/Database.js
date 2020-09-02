@@ -5,6 +5,35 @@ Tables.DailyQuestions = "DailyQuestions";
 Tables.Events = "Events";
 exports.Tables = Tables;
 
+exports.getQuestionRecommendation=function(db, companyId, questionIds, callback)
+{
+	var query = `SELECT D.questionId, recommendation 
+				FROM cultureHQ.DailyQuestions_Recommendations R, DailyQuestions D
+				where R.questionId = D.questionId AND D.publish='Y' AND D.questionId in (${questionIds}) AND D.companyId=${companyId}`;
+
+
+	// console.log(userId, questionId, companyId, toEmail, dateSent);
+	return runQuery(db, query, function(error, result)
+	{
+		if (error)
+		{
+			return callback(error, null);
+		}
+
+		try
+		{
+			var data = JSON.parse(result);
+			return callback(null, data);	
+		}
+		catch (e)
+		{
+			console.log(e, result);
+			return callback('error parsing', null);	
+		}
+		
+	});
+}
+
 exports.getDailyEmailsList=function(db, callback)
 {
 	var query = "SELECT * FROM cultureHQ.DailyEmailLists";
@@ -70,6 +99,12 @@ exports.getSendLogs = function(db, companyId, callback)
 exports.getUserProfile = function(db, userId, callback)
 {
 	var query = "select * from Users where userId='" + userId+"'";
+	return runQuery(db, query, callback);
+}	
+
+exports.getMyProfile = function(db, userId, callback)
+{
+	var query = "select fName, lName, email, profileImage from Users where userId='" + userId+"'";
 	return runQuery(db, query, callback);
 }	
 
