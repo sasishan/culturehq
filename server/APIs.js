@@ -12,8 +12,11 @@ getAPIProcessor = function(apiPath)
 		case '/api/v1/myprofile':
 			return Users.API_myProfile
 
-		case '/api/v1/engagement/recommendations':
+		case '/api/v1/engagement/recommendations/question':
 			return Engagement.API_getQuestionRecommendations;
+
+		case '/api/v1/engagement/recommendations':
+			return Engagement.API_getAllRecommendations			
 
 		case '/api/v1/engagement/responses':
 			return Engagement.API_getEngagmentResponses;
@@ -23,6 +26,9 @@ getAPIProcessor = function(apiPath)
 
 		case '/api/v1/engagement/publishedquestions':
 			return Engagement.API_getEngagementDailyQuestionsPublished;		
+
+		case '/api/v1/engagement/dailyquestion/:questionId/update':
+			return Engagement.API_updateQuestions;		
 
 		case '/api/v1/engagement/sendlogs':
 			return Engagement.API_getSendLogs;

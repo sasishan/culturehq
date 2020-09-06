@@ -15,7 +15,9 @@ export const URLS = Object.freeze({
 	createNewQuestion: baseURL + "/api/v1/engagement/newquestion",
 	publishQuestion: baseURL + "/api/v1/engagement/",
 	getLogs: baseURL + "/api/v1/engagement/sendlogs",
-	engagementURL: baseURL + "/api/v1/engagement/recommendations",
+	questionRecommendation: baseURL + "/api/v1/engagement/recommendations/question",
+	allRecommendations: baseURL + "/api/v1/engagement/recommendations",
+	updateDailyQuestion: baseURL + '/api/v1/engagement/dailyquestion/',
 	// "https://h6oygjk5ci.execute-api.us-west-2.amazonaws.com/default/myCultureQuestions"
 });
 

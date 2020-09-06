@@ -82,7 +82,15 @@ exports.sendResponse = function(res, response)
 
 exports.sendErrorResponse = function(res, error)
 {
-	return res.status(error.errorCode).send(error.message);	
+	if (error==undefined || error.errorcode==undefined)
+	{
+		return res.status(ErrorCodes.INTERNAL_ERROR).send("There was an internal error");		
+	}
+	else
+	{
+		return res.status(error.errorCode).send(error.message);		
+	}
+	
 }
 
 exports.callExternalAPI = function(idToken, apiKey, url, callback)

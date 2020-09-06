@@ -17,6 +17,7 @@ var
   Engagement = require('./routes/Engagement')
   ;
   // Database = require('./Database/Database');
+var args = process.argv.slice(2);
 
 // const { authenticate, authenticationError } = require('aws-cognito-express');
 const app = express();
@@ -52,7 +53,15 @@ app.use(function(req, res, next)
 {
     // CORS headers
     //https://jotdot.honchohq.com/
-    res.header("Access-Control-Allow-Origin", "http://localhost:8080"); // restrict it to the required domain
+    if (args.includes('-dev'))
+    {
+      res.header("Access-Control-Allow-Origin", "http://localhost:8080"); // restrict it to the required domain  
+    }
+    else
+    {
+      res.header("Access-Control-Allow-Origin", "*"); // restrict it to the required domain  
+    }
+    
     res.header("Access-Control-Allow-Credentials", true); // restrict it to the required domain
     res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
     // Set custom headers for CORS
@@ -138,24 +147,26 @@ app.get('/api/v1/oneonone/questionbank/categories', isAuthenticated, APIs.receiv
 app.get('/api/v1/oneonone/templates', isAuthenticated, APIs.receiveAPIRequest);
 app.get('/api/v1/engagement/sendlogs', isAuthenticated, APIs.receiveAPIRequest);
 app.get('/api/v1/myprofile', isAuthenticated, APIs.receiveAPIRequest);
-app.post('/api/v1/engagement/recommendations', isAuthenticated, APIs.receiveAPIRequest);
-
+app.get('/api/v1/engagement/recommendations', isAuthenticated, APIs.receiveAPIRequest);
+app.post('/api/v1/engagement/recommendations/question', isAuthenticated, APIs.receiveAPIRequest);
 app.post('/api/v1/engagement/sendonequestion',isAuthenticated, APIs.receiveAPIRequest);
 app.post('/api/v1/engagement/:questionId/publish',isAuthenticated, APIs.receiveAPIRequest);
+app.post('/api/v1/engagement/dailyquestion/:questionId/update',isAuthenticated, APIs.receiveAPIRequest);
+
 // app.post('/api/v1/engagement/:questionid/unpublish',isAuthenticated, APIs.receiveAPIRequest);
 app.post('/api/v1/engagement/newquestion',isAuthenticated, APIs.receiveAPIRequest);
 
 
 // app.get(OpsConfig.APIPaths.GET_OneJotsSections, isAuthenticated, APIs.receiveAPIRequest);
 
-var args = process.argv.slice(2);
+
 
 //HTTP SERVER
 var server = http.createServer(app);
 
 server.listen(app.get('port'), function()
 {
-  if (args.includes('-nodaily')==false)
+  if (args.includes('-nodaily')==false && args.includes('-dev')==false)
   {
     console.log(new Date());
     var cronSched = '0 8 * * *';

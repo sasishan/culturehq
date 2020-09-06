@@ -3,6 +3,7 @@ var  Database  = require('../database/Database')
 	,axios = require('axios')
 	,Config=require('../config.js')
 	,mail = require('./Mail.js')
+	
 	;
 
 exports.API_getQuestionRecommendations = function(db, userId, params, callback)
@@ -120,6 +121,37 @@ getRecommendation=function(score, questionRecLogic)
 		}
 	}
 	return questionRecLogic.defaultRecommendation;
+}
+
+exports.API_updateQuestions = function(db, userId, params, callback)
+{
+	if (userId)
+	{
+		var questionId = params.params.questionId;
+		var question = params.body.question;
+		var companyId = params.userProfile.companyId;
+
+		if (questionId==null || question==null || question.question==null || question.answers==null || question.recommendation==null)
+		{
+			return callback('Missing data ', null);	
+		}
+
+		Database.updateQuestionAndRecommendation(db, companyId, questionId, question, function(error, result)
+		{
+			if (error)
+			{
+				return callback(error, null);
+			}
+
+			return callback(null, "Updated");			
+		});
+	}
+	else
+	{
+		console.log('Error with id');
+		return callback('Error with id', null);
+	}	
+	
 }
 
 exports.API_getSendLogs = function(db, userId, params, callback)
@@ -448,6 +480,44 @@ exports.API_getEngagementDailyQuestions = function(db, userId, params, callback)
 		return callback('Error with id', null);
 	}	
 }
+
+exports.API_getAllRecommendations = function(db, userId, params, callback)
+{
+	if (userId) //@todo should be admin
+	{
+		var companyId = params.userProfile.companyId;
+		Database.getAllQuestionRecommendations(db, companyId, function(err, resp)
+		{
+			try
+			{
+				if (err)
+				{
+					return callback(err, null);
+				}
+
+				for (var i=0; i<resp.length; i++)
+				{
+					var r = resp[i];
+					r.recommendation = JSON.parse(r.recommendation);
+				}
+				return callback(null, resp);
+
+			}
+			catch (err)
+			{
+				console.log('Error with recommendations');
+				return callback(err, null);				
+			}
+
+		});
+	}
+	else
+	{
+		console.log('Error with id');
+		return callback('Error with id', null);
+	}	
+}
+
 
 exports.API_getEngagmentResponses = function(db, userId, params, callback)
 {

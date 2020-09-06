@@ -5,8 +5,9 @@
       <h6>Survey Questions</h6>
       <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#newQuestionModal"><small>New Question</small></button>     
       <div class="card sharp-card mt-4" v-for="question in surveyQuestions" :key="question.questionId">
-        <div class="card-header ">
-          <button type="button" class="btn btn-outline-primary ml-2 btn-sm float-right" data-toggle="modal" @click="selectedQuestion=question" data-target="#sendModal"><small>Send Question</small></button>     
+        <div class="card-header ">          
+          <button type="button" class="btn btn-outline-primary ml-2 btn-sm float-right" data-toggle="modal" @click="selectedQuestion=question" data-target="#sendModal"><small>Send</small></button>     
+          <button type="button" class="btn btn-outline-primary ml-2 btn-sm float-right" data-toggle="modal" @click="selectedQuestion=question;selectedQuestion.answersText=JSON.stringify(selectedQuestion.answers);selectedQuestion.recommendationsText=JSON.stringify(selectedQuestion.recommendation)" data-target="#updateQuestionModal"><small>Edit</small></button>          
           <button type="button" class="btn btn-outline-secondary btn-sm float-right" data-toggle="modal" data-target="#publishModal" @click="selectedQuestion=question">
             <small><span v-if="question.publish=='Y'">Published</span><span v-if="question.publish=='N'" class="text-danger">Not Published</span></small>
           </button>     
@@ -23,7 +24,16 @@
           <!-- <span v-for="option in question.answers.options"> -->
             <!-- {{option}} -->
           <!-- <span>  -->
-          
+          <hr>
+          <h6>Recommendations</h6>
+          <div v-if="question.recommendation==undefined">No recommendations yet</div>
+          <div v-if="question.recommendation">
+            <div v-for="(recommendation,index) in question.recommendation.recommendations" :key="index">
+            <b>{{recommendation.minValue}} - {{recommendation.maxValue}}: </b>
+            {{recommendation.recommendation}}
+            </div>          
+          </div>
+
         </div>
       </div>
     </div>
@@ -102,6 +112,39 @@
       </div>
     </div> 
 
+
+    <div class="modal fade" id="updateQuestionModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalLabel">Update Survey Question</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+
+            <label>Question Text:</label>
+            <input type="text" class="col-12" v-model="selectedQuestion.question" placeholder="Enter question text"/>
+            <label class="mt-4">Answers Text:</label>
+            <textarea rows="8" class="col-12" v-model="selectedQuestion.answersText" />
+            <!-- <div class="mt-2 text-success"><b>{{updateQuestionMessage}}</b></div> -->
+            <label class="mt-4">Cultures:</label> 
+            <span v-for="(culture, index) in selectedQuestion.cultures" :key="index">{{culture}} </span>
+            <br>
+            <button class="badge badge-secondary ml-2 mt-1" v-for="culture in cultureOptions" :key="culture.name" @click="toggleCulture(selectedQuestion, culture)">
+            {{culture.name}}
+            </button>        
+            <hr>
+            <label class="mt-4">Recommendation Text:</label>
+            <textarea rows="20" class="col-12" v-model="selectedQuestion.recommendationsText" />            
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" @click="updateQuestion(selectedQuestion)">Update</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" >Cancel</button>          
+          </div>
+
+        </div>
+      </div>
+    </div> 
   </div>
 </template>
 
@@ -138,6 +181,7 @@ export default {
   {
     await this.loadSurveyQuestions();
     await this.loadCultureOptions();
+    await this.loadSurveyQuestionsRecommendations();
     // console.log('loaded')
   },
   created()
@@ -267,6 +311,40 @@ export default {
 
       return this.surveyQuestions;
     },   
+    async loadSurveyQuestionsRecommendations()
+    {
+      var url= URLS.allRecommendations;
+
+      var recommendations = await Comms.get(url).catch((error) => 
+      { 
+        return {};
+      });
+
+      if (recommendations)
+      {        
+        // recommendations=JSON.parse(recommendations);
+        for (var i=0; i< recommendations.length; i++)
+        {
+          var r = recommendations[i];
+          for (var j=0; j< this.surveyQuestions.length; j++)
+          {
+            var q = this.surveyQuestions[j];
+            if (q.questionId==r.questionId)
+            {
+              // console.log(r.recommendation);
+              this.$set(q, 'recommendation', r.recommendation);  
+
+              // console.log('setting', q);
+              break;
+            }
+            
+          }            
+        }
+      
+      }
+
+      return this.surveyQuestions;
+    },      
     async sendQuestion(question)
     {
       if (this.emailAddresses=="")
@@ -290,9 +368,35 @@ export default {
         }
       });
     },
+    updateQuestion(question)
+    {
+      if (question.question=="")
+      {
+        return;
+      }
+
+      var url= URLS.updateDailyQuestion+question.questionId+'/update';
+      question.answers = JSON.parse(question.answersText);
+      if (question.recommendationsText==undefined || question.recommendationsText=='')
+      {
+        question.recommendationsText="{}";
+      }
+      question.recommendation= JSON.parse(question.recommendationsText);
+      var parameters = { question: question };
+      var that = this;
+      Comms.post(url, parameters, function(error, result)
+      {
+        if (result)
+        {
+          console.log('Updated');
+          // that.cancelMessage = "Close";
+          // that.newQuestionMessage="Success! This question has been created."
+        }
+      });  
+    },   
     createNewQuestion(newQuestion)
     {
-      if (this.newQuestion.question=="")
+      if (newQuestion.question=="")
       {
         return;
       }

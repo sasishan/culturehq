@@ -1,9 +1,87 @@
 // var ObjectId = require('mongodb').ObjectID;
-
+var mysql = require('mysql');
 var Tables={};
 Tables.DailyQuestions = "DailyQuestions";
 Tables.Events = "Events";
 exports.Tables = Tables;
+
+exports.updateQuestionAndRecommendation = function(db, companyId, questionId, question, callback)
+{
+	var answers=JSON.stringify(question.answers);
+	var query = `UPDATE DailyQuestions D
+				SET question='${question.question}', answers='${answers}' 
+				where D.questionId =${questionId} AND D.companyId=${companyId}`;
+
+	runQuery(db, query, function(error, result)
+	{
+		if (error)
+		{
+			return callback(error, null);
+		}
+
+		var rec= mysql.escape(JSON.stringify(question.recommendation));
+		query = `REPLACE INTO DailyQuestions_Recommendations (questionId, Recommendation) VALUES(${questionId}, ${rec})`
+		// query = `UPDATE DailyQuestions_Recommendations D
+		// 		SET Recommendation='${rec}' 
+		// 		where D.questionId =${questionId}`;		
+
+		runQuery(db, query, function(error, result)
+		{
+			query = `delete from mapping_DailyQuestions_Cultures where questionId=${questionId}`;
+			runQuery(db, query, function(error, result)
+			{	
+				var q="";
+				for (var i=0; i< question.cultures.length; i++)
+				{
+					var culture = question.cultures[i];
+					q +=`insert into mapping_DailyQuestions_Cultures values('${questionId}', '${culture.cultureId}');`;
+				}	
+
+				runQuery(db, q, function(error, result)
+				{
+					if (error)
+					{
+						return callback(error, null);
+					}
+				});
+
+			});
+			
+		});
+
+	
+		
+	});
+}
+
+exports.getAllQuestionRecommendations=function(db, companyId, callback)
+{
+	var query = `SELECT D.questionId, recommendation 
+				FROM cultureHQ.DailyQuestions_Recommendations R, DailyQuestions D
+				where R.questionId = D.questionId AND D.companyId=${companyId}`;
+
+
+	// console.log(userId, questionId, companyId, toEmail, dateSent);
+	return runQuery(db, query, function(error, result)
+	{
+		if (error)
+		{
+			return callback(error, null);
+		}
+
+		try
+		{
+			var data = JSON.parse(result);
+			return callback(null, data);	
+		}
+		catch (e)
+		{
+			console.log(e, result);
+			return callback('error parsing', null);	
+		}
+		
+	});
+}
 
 exports.getQuestionRecommendation=function(db, companyId, questionIds, callback)
 {
@@ -148,7 +226,7 @@ exports.createNewQuestion = function(db, companyId, newQuestion, callback)
 
 		var result = JSON.parse(result);
 		var questionId = result.insertId;
-		console.log(result, questionId);
+		// console.log(result, questionId);
 		for (var i=0; i< newQuestion.cultures.length; i++)
 		{
 			var culture = newQuestion.cultures[i];
@@ -213,6 +291,8 @@ exports.getOneDailyQuestion = function(db, questionId, companyId, callback)
 		return callback(null, templates);
 	});
 }
+
+
 
 exports.getDailyQuestions = function(db, companyId, onlyPublished=true, callback)
 {

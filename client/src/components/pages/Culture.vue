@@ -28,7 +28,7 @@
                     {{culture.culture}}
                     </span>
                 </small><br>
-                <small>{{surveyQuestion.lastSent}}</small>
+                <small>{{surveyQuestion.lastSent | moment("MM/DD/YY")}}, Id: {{surveyQuestion.questionId}}</small>
               </div>
               <div class="card-body">
                 <div class="text-center" v-if="!isLoaded">
@@ -120,7 +120,7 @@ export default {
     async loadQuestionRecommendations()
     {
 
-      var url= URLS.engagementURL;
+      var url= URLS.questionRecommendation;
       var payload={scores:[]};
       for (var i=0; i<this.surveyQuestions.length;i++)
       {
