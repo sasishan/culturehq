@@ -159,6 +159,7 @@ exports.getUserIdCompanyIdFromEmail = function(db, email, callback)
 {
 	
 	var date = (new Date()).toISOString();
+	email = mysql.escape(email);
 
 	var query = `select userId, companyId from Users where email=${email}`;
 
@@ -168,8 +169,10 @@ exports.getUserIdCompanyIdFromEmail = function(db, email, callback)
 
 exports.logIncomingDailyQuestionAnswer = function(db, questionId, companyId, senderEmail, answer, emailText, callback)
 {
-	
 	var date = (new Date()).toISOString();
+	senderEmail = mysql.escape(senderEmail);
+	answer = mysql.escape(answer);
+	emailText = mysql.escape(emailText);
 
 	var query = `insert into DailyQuestions_Answers (companyId, questionId, senderEmail, answer, emailText, dateReceived) 
 				values( '${companyId}', ${questionId}, ${senderEmail}, '${answer}', '${emailText}, ${date}')`;
