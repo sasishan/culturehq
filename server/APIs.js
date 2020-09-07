@@ -85,7 +85,7 @@ exports.receiveAPIRequest = function(req, res)
 			{
 				if (error)
 				{
-					console.log('Error: ', JSON.stringify(error));
+					console.log('receiveAPIRequest Error: ', JSON.stringify(error));
 					return Helpers.sendErrorResponse(res, error);			
 				}
 				else

@@ -11,6 +11,7 @@ exports.API_ReceiveIncomingMail = function(db, userId, params, callback)
 	// 	}
 	// }
 
+	console.log(params);
 	console.log("Body-plain-> ", params.body['body-plain']);
 	console.log("Subject-> ", params.body['subject']);
 	console.log("Sender-> ", params.body['sender']);
@@ -37,9 +38,12 @@ exports.API_ReceiveIncomingMail = function(db, userId, params, callback)
 					{
 						return callback("Sender is not valid: " + response.sender, null);
 					}						
+					else
+					{
+						Database.logIncomingDailyQuestionAnswer(db, response.questionId, companyId, response.sender, 
+							response.answer, response.emailText, callback);
+					}
 
-					Database.logIncomingDailyQuestionAnswer(db, response.questionId, companyId, response.sender, 
-						response.answer, response.emailText, callback);
 
 				}
 			});		
@@ -54,17 +58,13 @@ exports.API_ReceiveIncomingMail = function(db, userId, params, callback)
 		console.log(e);
 		return callback("Internal error", null);
 	}
-
-
-
-	return callback(null, "OK");
 }
 
 var NotFound = "not found";
 getResponse = function(text)
 {
 	console.log(text);
-	var response = {sender: NotFound, emailAnswer:NotFound, emailText: NotFound, questionId: NotFound};
+	var response = {sender: NotFound, answer:NotFound, emailText: NotFound, questionId: NotFound};
 	// var sender="not found";
 	// var emailAnswer = "not found";
 	// var mailResponse = "not found";
@@ -79,7 +79,7 @@ getResponse = function(text)
 	{
 		var bodyText = text['body-plain'];	
 		response.emailText = bodyText;
-		response.emailAnswer= bodyText.charAt(0); 
+		response.answer= bodyText.charAt(0); 
 	}
 
 	if (text['subject'])
@@ -91,7 +91,7 @@ getResponse = function(text)
 		}
 		catch (e)
 		{
-			console.log(e);
+			console.log('Parse error-> ', e);
 		}
 	}	
 

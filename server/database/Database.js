@@ -164,7 +164,15 @@ exports.getUserIdCompanyIdFromEmail = function(db, email, callback)
 	var query = `select userId, companyId from Users where email=${email}`;
 
 	// console.log(userId, questionId, companyId, toEmail, dateSent);
-	return runQuery(db, query, callback);
+	return runQuery(db, query, function(error, result)
+	{
+		if (error)
+		{
+			return callback(error, null);
+		}		
+		var result = JSON.parse(result);
+		return callback(null, result);
+	});
 }
 
 exports.logIncomingDailyQuestionAnswer = function(db, questionId, companyId, senderEmail, answer, emailText, callback)
@@ -174,7 +182,7 @@ exports.logIncomingDailyQuestionAnswer = function(db, questionId, companyId, sen
 	answer = mysql.escape(answer);
 	emailText = mysql.escape(emailText);
 
-	var query = `insert into DailyQuestions_Answers (companyId, questionId, senderEmail, answer, emailText, dateReceived) 
+	var query = `replace into DailyQuestions_Answers (companyId, questionId, senderEmail, answer, emailText, dateReceived) 
 				values( ${companyId}, ${questionId}, ${senderEmail}, ${answer}, ${emailText}, '${date}')`;
 
 	// console.log(userId, questionId, companyId, toEmail, dateSent);
