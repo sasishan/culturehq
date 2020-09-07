@@ -3,6 +3,7 @@ var
 	Schedule = require('./routes/Schedule'),
 	Engagement = require('./routes/Engagement'),
 	OneOnOnes = require('./routes/OneOnOnes'),
+	MailIncoming = require('./routes/MailIncoming'),
 	Helpers = require('./Helpers');	
 
 getAPIProcessor = function(apiPath)
@@ -10,7 +11,10 @@ getAPIProcessor = function(apiPath)
 	switch(apiPath)
 	{
 		case '/api/v1/myprofile':
-			return Users.API_myProfile
+			return Users.API_myProfile;
+
+		case '/api/v1/emails/incoming':
+			return MailIncoming.API_ReceiveIncomingMail
 
 		case '/api/v1/engagement/recommendations/question':
 			return Engagement.API_getQuestionRecommendations;

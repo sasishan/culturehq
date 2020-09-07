@@ -153,6 +153,8 @@ app.post('/api/v1/engagement/sendonequestion',isAuthenticated, APIs.receiveAPIRe
 app.post('/api/v1/engagement/:questionId/publish',isAuthenticated, APIs.receiveAPIRequest);
 app.post('/api/v1/engagement/dailyquestion/:questionId/update',isAuthenticated, APIs.receiveAPIRequest);
 
+app.post('/api/v1/emails/incoming', isNotAuthenticated, APIs.receiveAPIRequest);
+
 // app.post('/api/v1/engagement/:questionid/unpublish',isAuthenticated, APIs.receiveAPIRequest);
 app.post('/api/v1/engagement/newquestion',isAuthenticated, APIs.receiveAPIRequest);
 
