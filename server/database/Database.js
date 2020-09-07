@@ -154,6 +154,30 @@ exports.getNextDailyQuestionId = function(db, companyId, callback)
 	});
 }
 
+
+exports.getUserIdCompanyIdFromEmail = function(db, email, callback)
+{
+	
+	var date = (new Date()).toISOString();
+
+	var query = `select userId, companyId from Users where email=${email}`;
+
+	// console.log(userId, questionId, companyId, toEmail, dateSent);
+	return runQuery(db, query, callback);
+}
+
+exports.logIncomingDailyQuestionAnswer = function(db, questionId, companyId, senderEmail, answer, emailText, callback)
+{
+	
+	var date = (new Date()).toISOString();
+
+	var query = `insert into DailyQuestions_Answers (companyId, questionId, senderEmail, answer, emailText, dateReceived) 
+				values( '${companyId}', ${questionId}, ${senderEmail}, '${answer}', '${emailText}, ${date}')`;
+
+	// console.log(userId, questionId, companyId, toEmail, dateSent);
+	return runQuery(db, query, callback);
+}
+
 exports.logSentEmail = function(db, userId, questionId, companyId, toEmail, callback)
 {
 	
