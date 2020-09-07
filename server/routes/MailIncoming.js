@@ -61,7 +61,7 @@ getResponse = function(text)
 		response.sender = text['sender'];	
 	}
 	
-	if (params.body['body-plain'])
+	if (text['body-plain'])
 	{
 		var bodyText = text['body-plain'];	
 		response.emailText = bodyText;
