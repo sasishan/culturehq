@@ -175,7 +175,7 @@ exports.logIncomingDailyQuestionAnswer = function(db, questionId, companyId, sen
 	emailText = mysql.escape(emailText);
 
 	var query = `insert into DailyQuestions_Answers (companyId, questionId, senderEmail, answer, emailText, dateReceived) 
-				values( '${companyId}', ${questionId}, ${senderEmail}, '${answer}', '${emailText}, ${date}')`;
+				values( ${companyId}, ${questionId}, ${senderEmail}, ${answer}, ${emailText}, '${date}')`;
 
 	// console.log(userId, questionId, companyId, toEmail, dateSent);
 	return runQuery(db, query, callback);
