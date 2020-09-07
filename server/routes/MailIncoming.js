@@ -20,7 +20,7 @@ exports.API_ReceiveIncomingMail = function(db, userId, params, callback)
 		var response = getResponse(params.body);
 		if (response.sender!=NotFound)
 		{
-			Database.getUserIdCompanyIdFromEmail(db, sender, function(error, results)
+			Database.getUserIdCompanyIdFromEmail(db, response.sender, function(error, results)
 			{
 				if (error)
 				{
@@ -35,7 +35,7 @@ exports.API_ReceiveIncomingMail = function(db, userId, params, callback)
 					var companyId = profile.companyId;
 
 					Database.logIncomingDailyQuestionAnswer(db, response.questionId, companyId, response.sender, 
-						answer, response.emailText, callback);
+						response.answer, response.emailText, callback);
 
 				}
 			});		
