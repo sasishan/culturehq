@@ -11,10 +11,10 @@ exports.API_ReceiveIncomingMail = function(db, userId, params, callback)
 	// 	}
 	// }
 
-	console.log(params);
-	console.log("Body-plain-> ", params.body['body-plain']);
-	console.log("Subject-> ", params.body['subject']);
-	console.log("Sender-> ", params.body['sender']);
+	// console.log(params);
+	// console.log("Body-plain-> ", params.body['body-plain']);
+	// console.log("Subject-> ", params.body['subject']);
+	// console.log("Sender-> ", params.body['sender']);
 
 	try 
 	{
@@ -29,7 +29,7 @@ exports.API_ReceiveIncomingMail = function(db, userId, params, callback)
 					return callback(error, null);
 				}
 
-				console.log(results);
+				// console.log(results);
 				if (results.length>0)
 				{
 					var profile = results[0];
@@ -63,7 +63,7 @@ exports.API_ReceiveIncomingMail = function(db, userId, params, callback)
 var NotFound = "not found";
 getResponse = function(text)
 {
-	console.log(text);
+	// console.log(text);
 	var response = {sender: NotFound, answer:NotFound, emailText: NotFound, questionId: NotFound};
 	// var sender="not found";
 	// var emailAnswer = "not found";
