@@ -1,4 +1,5 @@
-var Config=require('../config.js');
+var Config=require('../config.js'), 
+	Database  = require('../database/Database');
 
 exports.API_ReceiveIncomingMail = function(db, userId, params, callback)
 {
@@ -14,33 +15,42 @@ exports.API_ReceiveIncomingMail = function(db, userId, params, callback)
 	console.log("Subject-> ", params.body['subject']);
 	console.log("Sender-> ", params.body['sender']);
 
-	var response = getResponse(params.body);
-	if (response.sender!=NotFound)
+	try 
 	{
-		Database.getUserIdCompanyIdFromEmail(db, sender, function(error, results)
+		var response = getResponse(params.body);
+		if (response.sender!=NotFound)
 		{
-			if (error)
+			Database.getUserIdCompanyIdFromEmail(db, sender, function(error, results)
 			{
-				console.log(error);
-				return callback(error, null);
-			}
+				if (error)
+				{
+					console.log(error);
+					return callback(error, null);
+				}
 
-			console.log(results);
-			if (results.length>0)
-			{
-				var profile = results[0];
-				var companyId = profile.companyId;
+				console.log(results);
+				if (results.length>0)
+				{
+					var profile = results[0];
+					var companyId = profile.companyId;
 
-				Database.logIncomingDailyQuestionAnswer(db, response.questionId, companyId, response.sender, 
-					answer, response.emailText, callback);
+					Database.logIncomingDailyQuestionAnswer(db, response.questionId, companyId, response.sender, 
+						answer, response.emailText, callback);
 
-			}
-		});		
+				}
+			});		
+		}
+		else
+		{
+			console.log('Unable to parse email response');
+		}
 	}
-	else
+	catch(e)
 	{
-		console.log('Unable to parse email response');
+		console.log(e);
+		return callback("Internal error", null);
 	}
+
 
 
 	return callback(null, "OK");
@@ -71,7 +81,14 @@ getResponse = function(text)
 	if (text['subject'])
 	{
 		var subject = text['subject'];	
-		response.questionId = getFromBetween(subject, 'Team Survey: ', '-Q');
+		try
+		{
+			response.questionId = parseInt(getFromBetween(subject, 'Team Survey: ', '-Q'));	
+		}
+		catch (e)
+		{
+			console.log(e);
+		}
 	}	
 
 	console.log('response', response);
