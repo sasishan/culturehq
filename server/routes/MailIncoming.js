@@ -34,13 +34,14 @@ exports.API_ReceiveIncomingMail = function(db, userId, params, callback)
 				{
 					var profile = results[0];
 					var companyId = profile.companyId;
-					if (companyId==undefined)
+					var senderId = profile.userId;
+					if (companyId==undefined || userId==undefined)
 					{
 						return callback("Sender is not valid: " + response.sender, null);
 					}						
 					else
 					{
-						Database.logIncomingDailyQuestionAnswer(db, response.questionId, companyId, response.sender, 
+						Database.logIncomingDailyQuestionAnswer(db, response.questionId, companyId, senderId, response.sender, 
 							response.answer, response.emailText, callback);
 					}
 

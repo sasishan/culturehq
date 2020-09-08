@@ -138,6 +138,7 @@ var isNotAuthenticated = function (req, res, next)
 
 //API routes
 app.get('/api/v1/test', isAuthenticated, APIs.receiveAPIRequest);
+// app.get('/api/v1/engagement/responses', isNotAuthenticated, APIs.receiveAPIRequest);
 app.get('/api/v1/engagement/dailyquestions', isAuthenticated, APIs.receiveAPIRequest);
 app.get('/api/v1/engagement/publishedquestions', isAuthenticated, APIs.receiveAPIRequest);
 app.get('/api/v1/engagement/responses', isAuthenticated, APIs.receiveAPIRequest);
@@ -153,6 +154,7 @@ app.post('/api/v1/engagement/sendonequestion',isAuthenticated, APIs.receiveAPIRe
 app.post('/api/v1/engagement/:questionId/publish',isAuthenticated, APIs.receiveAPIRequest);
 app.post('/api/v1/engagement/dailyquestion/:questionId/update',isAuthenticated, APIs.receiveAPIRequest);
 
+//EMAIL INCOMINGS
 app.post('/api/v1/emails/incoming', isNotAuthenticated, APIs.receiveAPIRequest);
 
 // app.post('/api/v1/engagement/:questionid/unpublish',isAuthenticated, APIs.receiveAPIRequest);

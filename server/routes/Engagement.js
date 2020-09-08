@@ -519,6 +519,40 @@ exports.API_getAllRecommendations = function(db, userId, params, callback)
 }
 
 
+exports.API_getEngagmentResponses2 = function(db, userId, params, callback)
+{
+	if (userId)
+	{
+		var companyId = params.userProfile.companyId;
+		Database.getMyReports(db, userId, function(err, resp)
+		{
+			try
+			{
+				if (err)
+				{
+					return callback(err, null);
+				}
+
+				return callback(null, resp);
+
+			}
+			catch (err)
+			{
+				console.log('Error with reports');
+				return callback(err, null);				
+			}
+
+		});
+	}
+	else
+	{
+		console.log('Error with id');
+		return callback('Error with id', null);
+	}		
+
+
+}
+
 exports.API_getEngagmentResponses = function(db, userId, params, callback)
 {
 	if (userId)

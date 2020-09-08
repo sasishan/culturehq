@@ -5,6 +5,36 @@ Tables.DailyQuestions = "DailyQuestions";
 Tables.Events = "Events";
 exports.Tables = Tables;
 
+exports.getMyReports=function(db, userId, callback)
+{
+	var managerId = mysql.escape(userId);
+	var query = 
+	`with recursive cte (managerId, reportId, depth) as ( 
+		select     managerId, reportId, 0 as depth
+		from       DirectReports
+		where      managerId = ${managerId}
+		union all
+		select     child.managerId, child.reportId, cte.depth+1
+		from       DirectReports child
+		inner join cte
+			on child.managerId = cte.reportId
+	) 
+	select reportId, fName, lName, depth from cte, Users U where U.userId=reportId`;
+
+	// console.log(userId, questionId, companyId, toEmail, dateSent);
+	return runQuery(db, query, function(error, result)
+	{
+		if (error)
+		{
+			return callback(error, null);
+		}
+
+		var data = JSON.parse(result);
+		return callback(null, data);
+	});
+}
+
+
 exports.updateQuestionAndRecommendation = function(db, companyId, questionId, question, callback)
 {
 	var answers=JSON.stringify(question.answers);
@@ -175,15 +205,16 @@ exports.getUserIdCompanyIdFromEmail = function(db, email, callback)
 	});
 }
 
-exports.logIncomingDailyQuestionAnswer = function(db, questionId, companyId, senderEmail, answer, emailText, callback)
+exports.logIncomingDailyQuestionAnswer = function(db, questionId, companyId, senderId, senderEmail, answer, emailText, callback)
 {
 	var date = (new Date()).toISOString();
 	senderEmail = mysql.escape(senderEmail);
 	answer = mysql.escape(answer);
 	emailText = mysql.escape(emailText);
+	senderId = mysql.escape(senderId);
 
-	var query = `replace into DailyQuestions_Answers (companyId, questionId, senderEmail, answer, emailText, dateReceived) 
-				values( ${companyId}, ${questionId}, ${senderEmail}, ${answer}, ${emailText}, '${date}')`;
+	var query = `replace into DailyQuestions_Answers (companyId, questionId, userId, senderEmail, answer, emailText, dateReceived) 
+				values( ${companyId}, ${questionId}, ${senderId}, ${senderEmail}, ${answer}, ${emailText}, '${date}')`;
 
 	// console.log(userId, questionId, companyId, toEmail, dateSent);
 	return runQuery(db, query, callback);
