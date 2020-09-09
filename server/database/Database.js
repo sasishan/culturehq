@@ -242,16 +242,17 @@ exports.getManagerIdUserIdCompanyIdFromEmail = function(db, email, callback)
 	});
 }
 
-exports.logIncomingDailyQuestionAnswer = function(db, questionId, companyId, senderId, senderEmail, answer, emailText, callback)
+exports.logIncomingDailyQuestionAnswer = function(db, questionId, companyId, senderId, senderEmail, answer, emailText, managerId, callback)
 {
 	var date = (new Date()).toISOString();
 	senderEmail = mysql.escape(senderEmail);
 	answer = mysql.escape(answer);
 	emailText = mysql.escape(emailText);
 	senderId = mysql.escape(senderId);
+	managerId = mysql.escape(managerId);
 
-	var query = `replace into DailyQuestions_Answers (companyId, questionId, userId, senderEmail, answer, emailText, dateReceived) 
-				values( ${companyId}, ${questionId}, ${senderId}, ${senderEmail}, ${answer}, ${emailText}, '${date}')`;
+	var query = `replace into DailyQuestions_Answers (companyId, questionId, userId, senderEmail, answer, emailText, managerId, dateReceived) 
+				values( ${companyId}, ${questionId}, ${senderId}, ${senderEmail}, ${answer}, ${emailText}, ${managerId}, '${date}')`;
 
 	// console.log(userId, questionId, companyId, toEmail, dateSent);
 	return runQuery(db, query, callback);

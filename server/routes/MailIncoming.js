@@ -35,6 +35,7 @@ exports.API_ReceiveIncomingMail = function(db, userId, params, callback)
 					var profile = results[0];
 					var companyId = profile.companyId;
 					var senderId = profile.userId;
+					var managerId = profile.managerId;
 					if (companyId==undefined || userId==undefined)
 					{
 						return callback("Sender is not valid: " + response.sender, null);
@@ -42,7 +43,7 @@ exports.API_ReceiveIncomingMail = function(db, userId, params, callback)
 					else
 					{
 						Database.logIncomingDailyQuestionAnswer(db, response.questionId, companyId, senderId, response.sender, 
-							response.answer, response.emailText, callback);
+							response.answer, response.emailText, managerId, callback);
 					}
 
 
