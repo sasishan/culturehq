@@ -551,18 +551,20 @@ exports.API_getEngagmentResponses2 = function(db, userId, params, callback)
 	if (userId)
 	{
 		var companyId = params.userProfile.companyId;
-		Database.getMyManagers(db, userId, function(err, reports)
+		Database.getMyManagers(db, userId, function(err, managers)
 		{
 			if (err)
 			{
 				return callback(err, null);
 			}
 
-			var responses = { directs: [], extended: { }}
-			for (var i=0; i< reports.directReports.length; i++)
+			var managerIds=[];
+			managerIds.push(userId);
+			for (var i=0; i< managers.length; i++)
 			{
-				var direct = reports.directReports[i];
+				managerIds.push(managers[i].userId);
 			}
+
 
 			return callback(null, reports);
 

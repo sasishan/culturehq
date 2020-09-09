@@ -69,7 +69,30 @@ exports.getMyReports=function(db, userId, callback)
 
 exports.getResponsesByManagers= function(db, companyId, managerIdArray, callback)
 {
+	var query = `SELECT managerId, questionId, answer 
+				FROM DailyQuestions_Answers A
+				where A.managerId in (${managerIdArray}) AND A.companyId=${companyId}`;
 
+	// console.log(userId, questionId, companyId, toEmail, dateSent);
+	return runQuery(db, query, function(error, result)
+	{
+		if (error)
+		{
+			return callback(error, null);
+		}
+
+		try
+		{
+			var data = JSON.parse(result);
+			return callback(null, data);	
+		}
+		catch (e)
+		{
+			console.log(e, result);
+			return callback('error parsing', null);	
+		}
+		
+	});	
 }
 
 exports.updateQuestionAndRecommendation = function(db, companyId, questionId, question, callback)

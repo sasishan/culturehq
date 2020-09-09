@@ -23,7 +23,7 @@ getAPIProcessor = function(apiPath)
 			return Engagement.API_getAllRecommendations			
 
 		case '/api/v1/engagement/responses':
-			return Engagement.API_getEngagmentResponses2;
+			return Engagement.API_getEngagmentResponses;
 
 		case '/api/v1/engagement/dailyquestions':
 			return Engagement.API_getEngagementDailyQuestions;
