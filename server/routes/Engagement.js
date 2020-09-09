@@ -518,29 +518,53 @@ exports.API_getAllRecommendations = function(db, userId, params, callback)
 	}	
 }
 
+getMyReports=function(db, userId, callback)
+{
+	Database.getMyReports(db, userId, function(err, reports)
+	{
+		if (err)
+		{
+			return callback(err, null);
+		}
+
+		var myReports={ directReports:[], extendedReports:[]};
+		for (var i=0; i<reports.length; i++)
+		{
+			var report = reports[i];
+			if (report.depth>0)
+			{
+				myReports.extendedReports.push(report);
+			}
+			else
+			{
+				myReports.directReports.push(report);
+			}
+		}
+
+		return callback(null, myReports);
+
+	});
+}
 
 exports.API_getEngagmentResponses2 = function(db, userId, params, callback)
 {
 	if (userId)
 	{
 		var companyId = params.userProfile.companyId;
-		Database.getMyReports(db, userId, function(err, resp)
+		Database.getMyManagers(db, userId, function(err, reports)
 		{
-			try
+			if (err)
 			{
-				if (err)
-				{
-					return callback(err, null);
-				}
-
-				return callback(null, resp);
-
+				return callback(err, null);
 			}
-			catch (err)
+
+			var responses = { directs: [], extended: { }}
+			for (var i=0; i< reports.directReports.length; i++)
 			{
-				console.log('Error with reports');
-				return callback(err, null);				
+				var direct = reports.directReports[i];
 			}
+
+			return callback(null, reports);
 
 		});
 	}

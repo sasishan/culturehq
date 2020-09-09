@@ -5,7 +5,7 @@ Tables.DailyQuestions = "DailyQuestions";
 Tables.Events = "Events";
 exports.Tables = Tables;
 
-exports.getMyReports=function(db, userId, callback)
+exports.getMyManagers=function(db, userId, callback)
 {
 	var managerId = mysql.escape(userId);
 	var query = 
@@ -19,7 +19,9 @@ exports.getMyReports=function(db, userId, callback)
 		inner join cte
 			on child.managerId = cte.reportId
 	) 
-	select reportId, fName, lName, depth from cte, Users U where U.userId=reportId`;
+	select distinct managerId as userId, M.fName as managerFName, M.lName as managerLName, depth 
+		from cte, Users U, Users M
+		where U.userId=reportId AND managerId=M.userId AND managerId!=${managerId}`;
 
 	// console.log(userId, questionId, companyId, toEmail, dateSent);
 	return runQuery(db, query, function(error, result)
@@ -34,6 +36,41 @@ exports.getMyReports=function(db, userId, callback)
 	});
 }
 
+exports.getMyReports=function(db, userId, callback)
+{
+	var managerId = mysql.escape(userId);
+	var query = 
+	`with recursive cte (managerId, reportId, depth) as ( 
+		select     managerId, reportId, 0 as depth
+		from       DirectReports
+		where      managerId = ${managerId}
+		union all
+		select     child.managerId, child.reportId, cte.depth+1
+		from       DirectReports child
+		inner join cte
+			on child.managerId = cte.reportId
+	) 
+	select managerId, M.fName as managerFName, M.lName as managerLName, reportId, U.fName as reportFName, U.lName as reportLName, depth 
+		from cte, Users U, Users M
+		where U.userId=reportId AND managerId=M.userId`;
+
+	// console.log(userId, questionId, companyId, toEmail, dateSent);
+	return runQuery(db, query, function(error, result)
+	{
+		if (error)
+		{
+			return callback(error, null);
+		}
+
+		var data = JSON.parse(result);
+		return callback(null, data);
+	});
+}
+
+exports.getResponsesByManagers= function(db, companyId, managerIdArray, callback)
+{
+
+}
 
 exports.updateQuestionAndRecommendation = function(db, companyId, questionId, question, callback)
 {
@@ -185,13 +222,13 @@ exports.getNextDailyQuestionId = function(db, companyId, callback)
 }
 
 
-exports.getUserIdCompanyIdFromEmail = function(db, email, callback)
+exports.getManagerIdUserIdCompanyIdFromEmail = function(db, email, callback)
 {
 	
 	var date = (new Date()).toISOString();
 	email = mysql.escape(email);
 
-	var query = `select userId, companyId from Users where email=${email}`;
+	var query = `select D.managerId, U.userId, U.companyId from Users U, DirectReports D where email=${email} AND U.userId=D.reportId`;
 
 	// console.log(userId, questionId, companyId, toEmail, dateSent);
 	return runQuery(db, query, function(error, result)

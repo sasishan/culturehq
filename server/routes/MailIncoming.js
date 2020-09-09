@@ -3,7 +3,7 @@ var Config=require('../config.js'),
 
 exports.API_ReceiveIncomingMail = function(db, userId, params, callback)
 {
-//      console.log(params.body.sender, params.body.subject, params.body); 
+	// console.log(params.body.sender, params.body.subject, params.body); 
 	// for (var key in params.body) {
 	// 	if (params.body.hasOwnProperty(key)) 
 	// 	{
@@ -21,7 +21,7 @@ exports.API_ReceiveIncomingMail = function(db, userId, params, callback)
 		var response = getResponse(params.body);
 		if (response.sender!=NotFound)
 		{
-			Database.getUserIdCompanyIdFromEmail(db, response.sender, function(error, results)
+			Database.getManagerIdUserIdCompanyIdFromEmail(db, response.sender, function(error, results)
 			{
 				if (error)
 				{
