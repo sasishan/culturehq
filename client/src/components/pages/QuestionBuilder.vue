@@ -396,7 +396,7 @@ export default {
 .myContainer 
 {
   margin: auto;
-  padding: 20px;
+  /*padding: 20px;*/
  /*margin-left: 100px;*/
  /*margin-right: 20px;*/
 

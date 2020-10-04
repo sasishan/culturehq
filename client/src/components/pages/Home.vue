@@ -149,7 +149,6 @@ export default {
     background: #ffe3c3;
   }      
 
-
   .noborder{
     border: 0;
   }

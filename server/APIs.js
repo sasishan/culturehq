@@ -4,6 +4,7 @@ var
 	Engagement = require('./routes/Engagement'),
 	OneOnOnes = require('./routes/OneOnOnes'),
 	MailIncoming = require('./routes/MailIncoming'),
+	Users = require('./routes/Users'),
 	Helpers = require('./Helpers');	
 
 getAPIProcessor = function(apiPath)
@@ -12,6 +13,9 @@ getAPIProcessor = function(apiPath)
 	{
 		case '/api/v1/myprofile':
 			return Users.API_myProfile;
+
+		case '/api/v1/myprofile/allmanagers':
+			return Users.API_getMyExtendedManagers;
 
 		case '/api/v1/emails/incoming':
 			return MailIncoming.API_ReceiveIncomingMail
@@ -23,7 +27,7 @@ getAPIProcessor = function(apiPath)
 			return Engagement.API_getAllRecommendations			
 
 		case '/api/v1/engagement/responses':
-			return Engagement.API_getEngagmentResponses;
+			return Engagement.API_getEngagmentResponses2;
 
 		case '/api/v1/engagement/dailyquestions':
 			return Engagement.API_getEngagementDailyQuestions;
@@ -56,7 +60,10 @@ getAPIProcessor = function(apiPath)
 			return OneOnOnes.API_getQuestionBankCultures;
 
 		case '/api/v1/oneonone/templates':
-			return OneOnOnes.API_get1on1Templates;			
+			return OneOnOnes.API_get1on1Templates;		
+
+		case '/api/v1/admin/users':
+			return Users.API_getAllUsers;	
 
 		default:
 			console.log('Processors:getAPIProcessor: Invalid path: '+ apiPath + ' found for processor');

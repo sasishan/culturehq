@@ -551,7 +551,7 @@ exports.API_getEngagmentResponses2 = function(db, userId, params, callback)
 	if (userId)
 	{
 		var companyId = params.userProfile.companyId;
-		Database.getMyManagers(db, userId, function(err, managers)
+		Database.getMyExtendedManagers(db, userId, function(err, managers)
 		{
 			if (err)
 			{
@@ -562,11 +562,20 @@ exports.API_getEngagmentResponses2 = function(db, userId, params, callback)
 			managerIds.push(userId);
 			for (var i=0; i< managers.length; i++)
 			{
+
 				managerIds.push(managers[i].userId);
 			}
 
+			Database.getResponsesByManagers(db, companyId, managerIds, function(error, responses)
+			{
+				if (error)
+				{
+					console.log(error);
+			  		return callback(error, null);
+				}				
 
-			return callback(null, reports);
+				return callback(null, responses);
+			});
 
 		});
 	}

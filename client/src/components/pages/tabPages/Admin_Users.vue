@@ -1,24 +1,26 @@
 <template>
   <div class="col-12">
+	<button type="button" class="btn btn-sm btn-outline-primary float-right mb-2 mt-2"><small>New Employee</small></button>
     <br>
     <table class="table small">
       <thead>
         <tr>
-          <th>Sent</th>
-          <th>To</th>
-          <th>QId</th>
-          <th>Question</th>
-          <th>Responded?</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Email</th>
+          <th>Manager</th>
+          <th></th>
+          <!-- <th>Permissions</th> -->
         </tr>
       </thead>   
       <tbody>
-      <tr v-for="log in logs" :key="log.id" class="mt-2">
-        <td>{{ log.dateSent  | moment("MM/DD/YY HH:MM:ss") }} </td>
-        <td>{{log.toEmail}}</td>
-        <td>{{log.questionId}}</td>
-        <td>{{log.question}}</td>
-        <td>{{log.responded}}</td>
-        <td></td>
+      <tr v-for="user in users" :key="user.userId" class="mt-2">
+        <td>{{user.fName}}</td>
+        <td>{{user.lName}}</td>
+        <td>{{user.email}}</td>
+        <td>{{user.managerFName}} {{user.managerLName}}</td>
+        <!-- <td>{{user.permissions}}</td> -->
+        <td>Edit</td>
       </tr>
       </tbody>   
     </table>
@@ -32,7 +34,7 @@ import { URLS } from '../../../Constants.js';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
 export default {
-  name: 'AddGoal',
+  name: 'Admin_Users',
   components: 
   {
   },
@@ -45,13 +47,14 @@ export default {
   },
   data: () => (
   {  
+	users:[],
     logs:[],
     surveyResponses:[]
   }),
   async mounted()
   {
-    await this.loadLogs();
-    await this.loadSurveyResponses();
+    await this.loadUsers();
+    // await this.loadSurveyResponses();
     // this.buildLogs();
   },
   created()
@@ -74,15 +77,16 @@ export default {
 
           if (l.questionId==JSON.parse(r.questionId) && l.toEmail.toLowerCase()==r.sender.toLowerCase())
           {
+
             l.responded="Yes";
             break;
           }
         }
       }
     },
-    async loadLogs()
+    async loadUsers()
     {
-      var url= URLS.getLogs;
+      var url= URLS.getUsers;
 
       var response = await Comms.get(url).catch((error) => 
       { 
@@ -91,14 +95,16 @@ export default {
 
       if (response)
       {
-        this.logs = [];
+        this.users = [];
         for (var i=0; i< response.length; i++)
         {
-          this.logs.push(response[i]);
+          // response[i].responded="No";
+          this.users.push(response[i]);
         }        
       }
 
-      return this.logs;
+
+      return this.users;
     },  
     async loadSurveyResponses()
     {

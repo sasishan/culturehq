@@ -1,27 +1,145 @@
 <template>
-  <div class="myContainer backgroundGrey2 col-12 mt-1">
-    <div class="row">
-      <div class="myContainer pt-1 col-9 ">
-        <h5 class="mt-3 mb-3"><b>Culture</b></h5>
+  <div class="myContainer col-12 mt-4">
+    <div class="tab-content">
+      <div class="row">
+        <div class="myContainer pt-1 col-9 transparent minHeight">
+          <h5 class="mt-3 mb-3"><b>Culture Score</b></h5>
+          <div v-if="surveyQuestions.initialized==false">
+             <!-- <pulse-loader color="#1976d2" size="10px" ></pulse-loader> -->
+          </div>     
+          <div class="card mt-3 mb-4 p-4 small"> 
+            <div class="text-center" v-if="!isLoaded">
+              <pulse-loader color="#1976d2" size="10px" ></pulse-loader>
+            </div>     
+            <span v-if="isLoaded">                  
+              <p>Questions Asked: {{cultureSummary.totalQuestions}}</p>
+              <p>Total Responses Received: {{cultureSummary.totalResponses}}</p>              
+            </span>
+            <canvas id="CultureSummary" width="400" height="100"></canvas>                      
+          </div>
+          <hr>
+          <h5 class="mt-3 mb-3"><b>Survey Responses</b></h5>
+          <span v-for="(surveyQuestion) in surveyQuestions" :key="surveyQuestion.questionId" style="cursor:pointer">
+          <div class="card sharp-card shadow-sm mt-3 mb-4"  data-toggle="modal" data-target="#questionDetailsModal" @click="showQuestionDetails(surveyQuestion)">
+<!--               <div class="card-header">
+                <span class="titleColor2"><b>{{surveyQuestion.question}}</b></span>                                
+                                      {{surveyQuestion.lastSent | moment("ddd DD MMM")}}  
+                      <span class="badge badge-secondary ml-2 mt-1" v-for="culture in surveyQuestion.cultures" 
+                        :key="culture.cultureId">
+                      {{culture.culture}}
+                      </span>
+              </div> -->
+            <div class="card-body">
+              <div class="text-center" v-if="!isLoaded">
+                <pulse-loader color="#1976d2" size="10px" ></pulse-loader>
+              </div>
+                <h6 class="card-title" v-if="isLoaded">
+                  <small>
+                      <b>{{surveyQuestion.lastSent | moment("ddd DD MMM")}}  
+                      <span class="badge badge-secondary ml-2 mt-1" v-for="culture in surveyQuestion.cultures" 
+                        :key="culture.cultureId">
+                      {{culture.culture}}
+                      </span></b>
+                    </small>                   
+<!--                   <small><b>Overall Score:</b></small>
+                  <span :class="getTotalResponseScoreColor(surveyQuestion.questionId)"> 
+                    {{getTotalResponseScore(surveyQuestion.questionId)}}
+                  </span><br><br>
+                  <small>Responses: {{getNumberResponses(surveyQuestion.questionId)}}</small> -->
+                </h6>                 
+                <div class="card-text">  
+                  <div class="row col-12">
+                       
+                  </div>
+                  <div class="row ">
+                    <div class="col-8">
+                      <table style="height: 100%; width: 100%;">
+                        <tbody>
+                          <tr>
+                            <td class="align-middle text-left">                        
+                              {{surveyQuestion.question}}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>                         
+                    </div>
+                    <div class="col-1 lightBackground">
+                      <table style="height: 100%; width: 100%;">
+                        <tbody>
+                          <tr>
+                            <td class="align-middle text-center">                        
+                              <span :class="getTotalResponseScoreColor(calculatedResponses, surveyQuestion.questionId)"> 
+                                <b>{{getTotalResponseScore(calculatedResponses, surveyQuestion.questionId)}}</b>
+                              </span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>                        
+                    </div>
+                    <div class="col-3"><canvas :id="surveyQuestion.questionId" ></canvas></div>
+                  </div>
+                 <!--  <hr>
+                  <div>
+                    <span v-for="response in calculatedResponsesByManager" :key="response.managerId">
+                      <div class="row">
+                        <div class="col-9">{{response.managerName}}</div>
+                        <div class="col-4"><canvas :id="getBarId(surveyQuestion.questionId, response.managerName)" ></canvas></div>
+                      </div>
+                    </span>
+                  </div> -->
+                  <!-- <br>
+                  <hr class="col-6">
+                  <h6 class="card-title">
+                      Question Insight & Actions
+                  </h6>
+                  <div class="myContainer" v-html="surveyQuestion.recommendation" v-if="surveyQuestion.recommendation"></div>
+                  <div class="myContainer" v-if="surveyQuestion.recommendation==undefined">None found.</div> -->
+                </div>
+              </div>
+            </div>              
+          </span>
+        </div>
       </div>
     </div>
-    <div class="myContainer pt-1 col-9 bg-white borderGrey1">
-      <nav>
-        <div class="nav nav-pills mt-2" id="nav-tab" role="tablist">                        
-          <a class="nav-item nav-link active" id="nav-resopnses-tab" data-toggle="tab" href="#nav-resopnses" role="tab" aria-controls="nav-home" aria-selected="true"><small><b>Responses</b></small></a>
-          <!-- <a class="nav-item nav-link " id="nav-culture-tab" data-toggle="tab" href="#nav-culture" role="tab" aria-controls="nav-profile" aria-selected="false"><small><b>Culture Score</b></small></a>                 -->
-        </div>
-      </nav>
-      <div class="tab-content mt-4 mb-4" id="nav-tabContent"  style="border: 0px solid #DDD;">
-        <div class="tab-pane fade show active" id="nav-resopnses" role="tabpanel" aria-labelledby="nav-resopnses-tab">
-          <Culture_Responses :surveyQuestions="surveyQuestions" :surveyResponses="surveyResponses" :cultureOptions="cultureOptions"/>
-        </div>              
-        <div class="tab-pane fade show" id="nav-culture" role="tabpanel" aria-labelledby="nav-culture-tab">
-          <!-- <Admin_SendLogs /> -->
+
+    <div class="modal fade" id="questionDetailsModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h6 class="modal-title" id="modalLabel">{{selectedSurveyQuestion.question}}</h6>
+          </div>
+          <div class="modal-body">
+            <label><b>By Manager</b></label>
+            <span v-for="response in calculatedResponsesByManager" :key="response.managerId">
+              <div class="row col-12 mt-4">
+                <div class="col-6">
+                  {{response.managerName}}
+                  <br>
+                  <small># of Responses: {{getNumberResponses(response, selectedSurveyQuestion.questionId)}}</small>
+                </div>
+                <div class="col-1">
+                  <span :class="getTotalResponseScoreColor(response, selectedSurveyQuestion.questionId)"> 
+                    <b>{{getTotalResponseScore(response, selectedSurveyQuestion.questionId)}}</b>
+                  </span>
+                </div>                
+                <div class="col-5"><canvas :id="getBarId(response.managerName)" ></canvas></div>
+              </div>
+            </span>        
+            <hr class="col-6">
+            <h6 class="card-title">
+                Question Insight & Actions
+            </h6>
+            <div class="myContainer" v-html="selectedSurveyQuestion.recommendation" v-if="selectedSurveyQuestion.recommendation"></div>
+            <div class="myContainer" v-if="selectedSurveyQuestion.recommendation==undefined">None found.</div>               
+          </div>
+          <div class="modal-footer">            
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" >Close</button>          
+          </div>
+
         </div>
       </div>
-    </div>
-  </div>
+    </div>     
+  </div>    
 </template>
 
 <script>
@@ -29,16 +147,14 @@
 import Comms from '../Comms';
 import { URLS } from '../../Constants.js';
 import { ChartColors } from '../../Constants.js';
-// import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
-import Culture_Responses from './tabPages/Culture_Responses';
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 const axios = require('axios');
 
 export default {
   name: 'Home',
   components: 
   {
-    // PulseLoader,
-    Culture_Responses
+    PulseLoader
   },
   props: 
   {
@@ -73,17 +189,16 @@ export default {
     {
       var that = this;
       
-      // await this.loadExtendedManagers();
-      // await this.loadSurveyQuestions();
-      // await this.loadSurveyResponses();
-      // await this.loadCultureOptions();
-      // console.log('loaded');
-      // this.calculateResponses(this.surveyQuestions, this.surveyResponses);        
-      // this.isLoaded=true;
+      await this.loadExtendedManagers();
+      await this.loadSurveyQuestions();
+      await this.loadSurveyResponses();
+      await this.loadCultureOptions();
+      this.calculateResponses(this.surveyQuestions, this.surveyResponses);        
+      this.isLoaded=true;
 
-      // this.calculateCultureSummary();
-      // await this.loadQuestionRecommendations();
-      //this.renderCharts();
+      this.calculateCultureSummary();
+      await this.loadQuestionRecommendations();
+      this.renderCharts();
     },
     async loadQuestionRecommendations()
     {
@@ -542,11 +657,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-.lightBackground
-{
-  background: #f7f7f7;
-}  
-
 
 .regForm {
   /*background-image: linear-gradient(180deg, #ff8a00, #e52e71);*/

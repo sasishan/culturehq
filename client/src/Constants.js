@@ -18,6 +18,8 @@ export const URLS = Object.freeze({
 	questionRecommendation: baseURL + "/api/v1/engagement/recommendations/question",
 	allRecommendations: baseURL + "/api/v1/engagement/recommendations",
 	updateDailyQuestion: baseURL + '/api/v1/engagement/dailyquestion/',
+	getUsers: baseURL+'/api/v1/admin/users',
+	getExtendedManagers: baseURL+'/api/v1/myprofile/allmanagers'
 	// "https://h6oygjk5ci.execute-api.us-west-2.amazonaws.com/default/myCultureQuestions"
 });
 

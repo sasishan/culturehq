@@ -5,7 +5,7 @@ Tables.DailyQuestions = "DailyQuestions";
 Tables.Events = "Events";
 exports.Tables = Tables;
 
-exports.getMyManagers=function(db, userId, callback)
+exports.getMyExtendedManagers=function(db, userId, callback)
 {
 	var managerId = mysql.escape(userId);
 	var query = 
@@ -69,9 +69,10 @@ exports.getMyReports=function(db, userId, callback)
 
 exports.getResponsesByManagers= function(db, companyId, managerIdArray, callback)
 {
-	var query = `SELECT managerId, questionId, answer 
-				FROM DailyQuestions_Answers A
-				where A.managerId in (${managerIdArray}) AND A.companyId=${companyId}`;
+	var managerIdArray = mysql.escape(managerIdArray);
+	var query = `SELECT managerId, U.fName as managerFName, U.lName as managerLName, senderEmail, questionId, answer 
+				FROM DailyQuestions_Answers A, Users U
+				where A.managerId in (${managerIdArray}) AND A.companyId=${companyId} AND A.managerId=U.userId`;
 
 	// console.log(userId, questionId, companyId, toEmail, dateSent);
 	return runQuery(db, query, function(error, result)
@@ -295,11 +296,32 @@ exports.logSentEmail = function(db, userId, questionId, companyId, toEmail, call
 
 exports.getSendLogs = function(db, companyId, callback)
 {
-	var query = `SELECT L.id, D.questionId, D.question, L.dateSent, L.toEmail FROM Log_DailyQuestionEmailsSent L, DailyQuestions D 
-		where L.questionId = D.questionId and L.companyId=${companyId} order by L.dateSent DESC`;
+	var companyId = mysql.escape(companyId);
+	var query = `SELECT L.id, D.questionId, D.question, L.dateSent, L.toEmail, 
+	(CASE WHEN answer IS NOT NULL THEN 'Yes' ELSE 'No' END) AS responded 
+		FROM 
+			Log_DailyQuestionEmailsSent L LEFT JOIN DailyQuestions_Answers A 
+			ON L.toEmail=A.senderEmail AND L.questionId=A.questionId, 
+			DailyQuestions D
+		WHERE L.questionId = D.questionId 
+		AND L.companyId=${companyId} 
+		order by L.dateSent DESC`
+
+	 // `SELECT L.id, D.questionId, D.question, L.dateSent, L.toEmail FROM Log_DailyQuestionEmailsSent L, DailyQuestions D 
+		// where L.questionId = D.questionId and L.companyId=${companyId} order by L.dateSent DESC`;
 
 	return runQuery(db, query, callback);
 }
+
+exports.getAllUsersWithManagers = function(db, companyId, callback)
+{
+	var companyId = mysql.escape(companyId);
+	var query = `select U.userId, U.fName, U.lName, U.email, U.companyId, U.profileImage, DR.managerId, M.fName as managerFName, M.lName as managerLName 
+				from Users U LEFT JOIN DirectReports DR on DR.reportId=U.userId 
+				LEFT JOIN Users M on DR.managerId=M.userId
+				where U.companyId=${companyId} ORDER BY U.fName`;
+	return runQuery(db, query, callback);
+}	
 
 exports.getUserProfile = function(db, userId, callback)
 {
@@ -312,6 +334,7 @@ exports.getMyProfile = function(db, userId, callback)
 	var query = "select fName, lName, email, profileImage from Users where userId='" + userId+"'";
 	return runQuery(db, query, callback);
 }	
+
 
 exports.getEvents = function(db, userId, callback)
 {

@@ -149,6 +149,9 @@ app.get('/api/v1/oneonone/templates', isAuthenticated, APIs.receiveAPIRequest);
 app.get('/api/v1/engagement/sendlogs', isAuthenticated, APIs.receiveAPIRequest);
 app.get('/api/v1/myprofile', isAuthenticated, APIs.receiveAPIRequest);
 app.get('/api/v1/engagement/recommendations', isAuthenticated, APIs.receiveAPIRequest);
+app.get('/api/v1/admin/users', isAuthenticated, APIs.receiveAPIRequest);
+app.get('/api/v1/myprofile/allmanagers', isAuthenticated, APIs.receiveAPIRequest);
+
 app.post('/api/v1/engagement/recommendations/question', isAuthenticated, APIs.receiveAPIRequest);
 app.post('/api/v1/engagement/sendonequestion',isAuthenticated, APIs.receiveAPIRequest);
 app.post('/api/v1/engagement/:questionId/publish',isAuthenticated, APIs.receiveAPIRequest);
