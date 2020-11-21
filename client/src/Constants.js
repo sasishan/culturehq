@@ -1,6 +1,6 @@
 // var surveyResults= "https://vwtcceuev6.execute-api.us-west-2.amazonaws.com/default/myCultureSurvey";
-var baseURL = "http://localhost:3030";
-// var baseURL = "https://culturehq.honchohq.com/"
+// var baseURL = "http://localhost:3030";
+var baseURL = "https://culturehq.honchohq.com/"
 // "http://3.221.72.198/";
 export const URLS = Object.freeze({
 	surveyQuestions: baseURL+"/api/v1/engagement/dailyquestions",

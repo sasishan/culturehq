@@ -1,11 +1,11 @@
 <template>
   <div class="myContainer backgroundGrey2 col-12 mt-1">
     <div class="row">
-      <div class="myContainer pt-1 col-9 ">
+      <div class="myContainer pt-1 col-lg-9">
         <h5 class="mt-3 mb-3"><b>Culture</b></h5>
       </div>
     </div>
-    <div class="myContainer pt-1 col-9 bg-white borderGrey1">
+    <div class="myContainer pt-1 col-lg-9 bg-white borderGrey1">
       <nav>
         <div class="nav nav-pills mt-2" id="nav-tab" role="tablist">                        
           <a class="nav-item nav-link active" id="nav-resopnses-tab" data-toggle="tab" href="#nav-resopnses" role="tab" aria-controls="nav-home" aria-selected="true"><small><b>Responses</b></small></a>

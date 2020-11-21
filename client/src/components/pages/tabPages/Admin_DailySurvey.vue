@@ -1,7 +1,7 @@
 <template>
   <div>
     
-    <div class="p-4">
+    <div class="pt-3 p-1 p-lg-4">
       <h6>Survey Questions</h6>
       <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#newQuestionModal"><small>New Question</small></button>     
       <div class="card sharp-card mt-4" v-for="question in surveyQuestions" :key="question.questionId">

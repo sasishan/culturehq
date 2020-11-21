@@ -1,6 +1,7 @@
 <template>
   <span>
-    <h6 class="card-title mb-n2">
+    <div class="card-title mb-n1">
+    <h6>
       <small>
           <b>{{surveyQuestion.lastSent | moment("ddd DD MMM")}}  
           <span class="badge badge-secondary ml-2 mt-1" v-for="culture in surveyQuestion.cultures" 
@@ -9,9 +10,10 @@
           </span></b>
         </small>                   
     </h6>                 
+    </div>
     <div class="card-text">  
       <div class="row">
-        <div class="col-8">
+        <div class="col-10 mr-n3 mr-lg-0 col-lg-8">
           <table style="height: 100%; width: 100%;">
             <tbody>
               <tr>
@@ -22,8 +24,8 @@
             </tbody>
           </table>                         
         </div>
-        <div class="col-1 backgroundGrey2">
-          <table class="ml-n1" style="height: 100%; width: 100%;">
+        <div class="col-2 col-lg-1 backgroundGrey2">
+          <table class="ml-n2 ml-lg-n1" style="height: 100%; width: 100%;">
               <tr>
                 <td class="align-middle text-center">                        
                   <span class="ml-2" :class="scoreColor" v-if="responseScore!='Not enough data'"> 
@@ -36,7 +38,7 @@
               </tr>
           </table>                        
         </div>
-        <div class="col-3">
+        <div class="col-lg-3 mt-3 mt-sm-0">
           <canvas :id="canvasId" style="border: 1px solid #DDD; padding: 0px"></canvas>
         </div>
       </div>

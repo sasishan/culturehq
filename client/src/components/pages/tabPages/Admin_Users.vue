@@ -2,7 +2,7 @@
   <div class="col-12">
 	<button type="button" class="btn btn-sm btn-outline-primary float-right mb-2 mt-2"><small>New Employee</small></button>
     <br>
-    <table class="table small">
+    <table class="table table-responsive small">
       <thead>
         <tr>
           <th>First Name</th>

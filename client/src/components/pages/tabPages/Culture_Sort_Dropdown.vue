@@ -20,10 +20,10 @@
 
 		<button class="btn btn-sm btn-outline-secondary ml-4" @click="toggleShowData()">
 			<span  v-if="showNoDataQuestions">
-				Hide Questions with No Data
+				Answered Questions
 			</span>
 			<span  v-if="!showNoDataQuestions">
-				Show Questions with Insufficient Data
+				All Questions
 			</span>			
 		</button>		
 	</span>

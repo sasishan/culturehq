@@ -1,7 +1,7 @@
 <template>
   <div class="col-12">
     <br>
-    <table class="table small">
+    <table class="table table-responsive small">
       <thead>
         <tr>
           <th>Sent</th>

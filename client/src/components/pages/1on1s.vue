@@ -1,5 +1,5 @@
 <template>
-  <div class="myContainer col-12 mt-4 mb-5 minHeight">
+  <div class="myContainer col-12 mb-5 minHeight">
     <div class="tab-content">
       <div class="row">
         <div class="myContainer pt-1 col-9 ">

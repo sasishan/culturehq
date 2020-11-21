@@ -1,13 +1,13 @@
 <template>
-  <div class="myContainer col-12 mt-4 mb-5 minHeight">
+  <div class="myContainer col-12 mb-5 minHeight">
     <div class="tab-content">
       <div class="row">
-        <div class="myContainer pt-1 col-9 ">
+        <div class="myContainer pt-1 col-lg-9 ">
           <h5 class="mt-3 mb-3"><b>1-on-1 Question Builder</b></h5>
         </div>
       </div>
       <div class="">
-        <div class="myContainer pt-1 col-9 bg-white borderGrey1">
+        <div class="myContainer pt-1 col-lg-9 bg-white borderGrey1">
           <!-- QUESTION BUILDER -->
           <h5 class="mt-n4 mb-1"><small><b></b></small></h5>
           <div v-if="isLoaded==false">
@@ -396,6 +396,8 @@ export default {
 .myContainer 
 {
   margin: auto;
+  /*padding-left: 10px;*/
+  /*padding-right: 10px;*/
   /*padding: 20px;*/
  /*margin-left: 100px;*/
  /*margin-right: 20px;*/

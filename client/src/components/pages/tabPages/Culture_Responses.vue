@@ -31,10 +31,14 @@
         <div class="modal-header card-header">
           <h6 class="modal-title" id="modalLabel">{{selectedSurveyQuestion.question}}</h6>
         </div>
-        <div class="modal-body ">
+        <div class="modal-body">
           <label><b>By Manager</b></label>
           <div class="row ml-1 mr-2 mt-2">
-            <div class="col-5"><small><b>Manager</b></small></div><div class="col-2"><small><b># Responses</b></small></div><div class="col-1"><small><b>Score</b></small></div><div class="col-1"></div><div class="col-2"><small><b>Responses</b></small></div>
+            <div class="col-4"><small><b>Manager</b></small></div>
+            <div class="col-5 col-lg-2"><small><b># Responses</b></small></div>
+            <div class="col-1"><small><b>Score</b></small></div>
+            <div class="col-1"></div>
+            <div class="col-2" v-show="!isMobile()"><small><b>Responses</b></small></div>
           </div>
           <span v-for="response in calculatedResponsesByManager" :key="response.managerId">
             <Culture_Responses_Details 
@@ -142,6 +146,13 @@ export default {
   },
   methods:
   {
+    isMobile() {
+       if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+         return true
+       } else {
+         return false
+       }
+     }, 
     selectSort(field)
     {
       // console.log(field);
@@ -578,6 +589,63 @@ export default {
             return ((x >y) ? -1 : ((x < y) ? 1 : 0));
         });
     },
+    renderTrendChart(chartType, bgColors, borderColors, id, labels, responseArray)
+    {
+      if (document.getElementById(id)==null)
+      {
+        return;
+      }
+
+      var ctx = document.getElementById(id).getContext('2d');
+      var myChart = new Chart(ctx, {
+          type: chartType,
+          data: {
+              labels: labels,
+              datasets: [{
+                  label: '',
+                  data: responseArray,
+                  backgroundColor: bgColors,
+                  borderColor: borderColors,
+                  borderWidth: 1,
+              }]
+          },
+          options: {
+              legend: 
+              {
+                  display: false,
+              } ,
+              scales: 
+              {
+                  xAxes:[{
+                    gridLines: {     
+                      // display: false,                 
+                    },          
+                    barPercentage: 1.3,          
+                    ticks: {
+                      display: false,
+                      autoSkip: false,
+                      fontSize: 10,
+                    }
+                  }],
+                  yAxes: [{
+                    display:false, 
+                    gridLines: {
+                      display: false,
+                    },                     
+                    ticks: {
+                      display: false,
+                      autoSkip: false,
+                      beginAtZero: true,
+                      max: 5,
+                      min: 0,
+                      stepSize: 1,
+                      fontSize: 10                              
+                    }                           
+                  }]
+              }
+          }
+      });
+    },      
     renderBarChart(chartType, bgColors, borderColors, id, labels, responseArray)
     {
       if (document.getElementById(id)==null)
