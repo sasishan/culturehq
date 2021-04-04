@@ -55,7 +55,7 @@ app.use(function(req, res, next)
     //https://jotdot.honchohq.com/
     if (args.includes('-dev'))
     {
-      res.header("Access-Control-Allow-Origin", "http://localhost:8080"); // restrict it to the required domain  
+      res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // restrict it to the required domain  
     }
     else
     {

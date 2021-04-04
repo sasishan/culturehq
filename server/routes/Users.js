@@ -5,7 +5,7 @@ exports.API_getMyProfile = function(db, userId, params, callback)
 	if (userId)
 	{
 		var companyId = params.userProfile.companyId;
-		Database.getMyProfile(db, companyId, callback);
+		Database.getMyProfile(db, userId, callback);
 	}
 	else
 	{

@@ -542,28 +542,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-.lightBackground
-{
-  background: #f7f7f7;
-}  
 
-
-.regForm {
-  /*background-image: linear-gradient(180deg, #ff8a00, #e52e71);*/
-  border-radius: 2px;
-  background: #FFF !important;
-  min-height: 1000px;
-  /*color: white;*/
-  border: "1px black";
-  margin: 20px auto;
-  padding: 40px;
-  width: 70%;
-  min-width: 300px;
-}
-
-.backgroundBlank
-{
-  background: transparent !important;
-}
 
 </style>

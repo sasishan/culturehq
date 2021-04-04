@@ -1,7 +1,7 @@
 <template>
   <div> 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">CultureHQ</a>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-green">
+    <a class="navbar-brand" href="#"><b>Sprout</b></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -26,10 +26,10 @@
         </ul>     
         <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex small">
           <li class="nav-item dropdown text-white">
-            <img class="rounded-circle mr-3" src="https://media-exp1.licdn.com/dms/image/C4E03AQG9Aqg3vyFgvA/profile-displayphoto-shrink_100_100/0?e=1602115200&v=beta&t=61IqgitynCDKP_MAnFiCJlEsq_BgXfsR4vWX4nvQVjM" width="40px"/> 
+            <img class="rounded-circle mr-3" src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" width="40px"/> 
           </li>
           <li class="nav-item dropdown text-white mt-1">
-            <button class="btn btn-sm btn-outline-primary" @click="signOut"><small>Sign Out</small></button>
+            <button class="btn btn-sm btn-white" @click="signOut"><small>Sign Out</small></button>
           </li>
         </ul>
     </div>
@@ -100,5 +100,6 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style>
+
 </style>

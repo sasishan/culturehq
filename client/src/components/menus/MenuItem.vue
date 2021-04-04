@@ -1,6 +1,6 @@
 <template>
   <router-link exact-active-class="active" class="nav-link" :to="{name: data.name}" v-if="displayRoute">
-    <small>{{data.meta.label || data.name}}</small>
+    <small class="menu-font">{{data.meta.label || data.name}}</small>
   </router-link>
 </template>
 
@@ -45,4 +45,5 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
 </style>

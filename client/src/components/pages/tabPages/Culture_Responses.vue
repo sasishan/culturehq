@@ -6,8 +6,7 @@
   <div class="transparent minHeight">
     <span v-for="surveyQuestion in getSurveyQuestions" :key="surveyQuestion.questionId" style="cursor:pointer">    
 
-      <div class="card sharp-card shadow-sm mt-3 mb-4"  data-toggle="modal" data-target="#questionDetailsModal" @click="showQuestionDetails(surveyQuestion)" v-show="showNoData==true || getTotalResponseScore(calculatedResponses, surveyQuestion.questionId)>0">
-
+      <div class="card sharp-card borderGrey2 mt-3 mb-2" data-toggle="modal" data-target="#questionDetailsModal" @click="showQuestionDetails(surveyQuestion)" v-show="showNoData==true || getTotalResponseScore(calculatedResponses, surveyQuestion.questionId)>0">
         <div class="card-body mt-n2 mb-n2">
           <div class="text-center" v-if="!isLoaded">
             <pulse-loader color="#1976d2" size="10px" ></pulse-loader>

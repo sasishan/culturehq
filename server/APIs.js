@@ -9,10 +9,11 @@ var
 
 getAPIProcessor = function(apiPath)
 {
+	console.log('api call--> ' + apiPath)
 	switch(apiPath)
-	{
+	{		
 		case '/api/v1/myprofile':
-			return Users.API_myProfile;
+			return Users.API_getMyProfile;
 
 		case '/api/v1/myprofile/allmanagers':
 			return Users.API_getMyExtendedManagers;

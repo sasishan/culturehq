@@ -19,9 +19,15 @@ exports.getMyExtendedManagers=function(db, userId, callback)
 		inner join cte
 			on child.managerId = cte.reportId
 	) 
-	select distinct managerId as userId, M.fName as managerFName, M.lName as managerLName, depth 
-		from cte, Users U, Users M
-		where U.userId=reportId AND managerId=M.userId AND managerId!=${managerId}`;
+    select distinct managerId as userId, depth, fName as managerFName, lName as managerLName, profileImage 
+    	from cte, Users U
+	where 
+		managerId!=${managerId} AND U.userId=managerId`;
+
+
+	// select distinct managerId as userId, U.profileImage, M.fName as managerFName, M.lName as managerLName, depth 
+	// 	from cte, Users U, Users M
+	// 	where U.userId=reportId AND managerId=M.userId AND managerId!=${managerId}`;
 
 	// console.log(userId, questionId, companyId, toEmail, dateSent);
 	return runQuery(db, query, function(error, result)
@@ -331,10 +337,9 @@ exports.getUserProfile = function(db, userId, callback)
 
 exports.getMyProfile = function(db, userId, callback)
 {
-	var query = "select fName, lName, email, profileImage from Users where userId='" + userId+"'";
+	var query = "select userId, fName, lName, email, profileImage from Users where userId='" + userId+"'";
 	return runQuery(db, query, callback);
 }	
-
 
 exports.getEvents = function(db, userId, callback)
 {
